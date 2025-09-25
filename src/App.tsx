@@ -49,13 +49,9 @@ interface SpeechRecognitionErrorEvent {
   message: string
 }
 
-// Declare spark global
+// Declare spark global (removed since we're using N8N)
 declare global {
   interface Window {
-    spark: {
-      llmPrompt: (strings: TemplateStringsArray, ...values: any[]) => string
-      llm: (prompt: string, modelName?: string, jsonMode?: boolean) => Promise<string>
-    }
     SpeechRecognition: {
       new(): SpeechRecognition
     }
@@ -155,30 +151,48 @@ function App() {
     setIsLoading(true)
 
     try {
-      // Create prompt for the AI
+      // Get conversation history for context
       const conversationHistory = (messages || []).slice(-10) // Keep last 10 messages for context
-      const contextMessages = conversationHistory.map(msg => 
-        `${msg.role === 'user' ? 'Huésped' : 'Asistente'}: ${msg.content}`
-      ).join('\n')
       
-      const prompt = window.spark.llmPrompt`Eres un asistente profesional de hotel de lujo. Responde de manera elegante, útil y profesional a las consultas de los huéspedes. Mantén un tono cordial pero sofisticado.
+      // Prepare payload for N8N webhook
+      const payload = {
+        message: userMessage.content,
+        role: 'user',
+        timestamp: Date.now(),
+        sessionId: 'hotel-chat-session', // You can make this dynamic per user
+        conversationHistory: conversationHistory.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+        }))
+      }
 
-${contextMessages ? `Conversación previa:\n${contextMessages}\n\n` : ''}Consulta actual del huésped: ${userMessage.content}
+      // Send to N8N webhook
+      const response = await fetch('https://n8n-n8n.ua4qkv.easypanel.host/webhook-test/8cc93673-7b91-4992-aca5-834c8e66890a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      })
 
-Por favor proporciona una respuesta profesional y útil como asistente de hotel.`
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
-      const response = await window.spark.llm(prompt, 'gpt-4o')
-
+      const data = await response.json()
+      
+      // Expect the N8N workflow to return a response message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: data.response || data.message || 'Lo siento, no he podido procesar su consulta en este momento.',
         role: 'assistant',
         timestamp: Date.now() + 1
       }
 
       setMessages(currentMessages => [...(currentMessages || []), assistantMessage])
     } catch (error) {
-      console.error('Error getting AI response:', error)
+      console.error('Error sending message to N8N:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Disculpe, he encontrado un error al procesar su consulta. Por favor, inténtelo nuevamente.',
@@ -449,12 +463,12 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
             </div>
           </div>
           
-          {/* Model selector like in reference */}
+          {/* Model selector - now shows N8N connection */}
           <div className="flex items-center justify-center mt-3">
             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-6 px-2 hover:text-foreground">
               <Sparkle size={12} className="mr-1" />
-              Asistente Profesional
-              <span className="ml-2">⌄</span>
+              Conectado a N8N
+              <span className="ml-2">•</span>
             </Button>
           </div>
         </div>
