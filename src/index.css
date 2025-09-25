@@ -92,3 +92,19 @@
   background: oklch(0.1 0.005 240 / 0.8);
   border: 1px solid oklch(0.2 0.01 240 / 0.2);
 }
+
+/* Recording animation */
+@keyframes pulse-recording {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.recording-pulse {
+  animation: pulse-recording 1.5s ease-in-out infinite;
+}

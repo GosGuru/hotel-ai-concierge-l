@@ -5,7 +5,49 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, Paperclip, Buildings } from '@phosphor-icons/react'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, MicrophoneSlash, Paperclip, Buildings } from '@phosphor-icons/react'
+
+// Speech Recognition types
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  onresult: (event: SpeechRecognitionEvent) => void
+  onerror: (event: SpeechRecognitionErrorEvent) => void
+  onstart: () => void
+  onend: () => void
+  start(): void
+  stop(): void
+  abort(): void
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList
+  resultIndex: number
+}
+
+interface SpeechRecognitionResultList {
+  length: number
+  item(index: number): SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionResult {
+  length: number
+  item(index: number): SpeechRecognitionAlternative
+  [index: number]: SpeechRecognitionAlternative
+  isFinal: boolean
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string
+  confidence: number
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string
+  message: string
+}
 
 // Declare spark global
 declare global {
@@ -13,6 +55,12 @@ declare global {
     spark: {
       llmPrompt: (strings: TemplateStringsArray, ...values: any[]) => string
       llm: (prompt: string, modelName?: string, jsonMode?: boolean) => Promise<string>
+    }
+    SpeechRecognition: {
+      new(): SpeechRecognition
+    }
+    webkitSpeechRecognition: {
+      new(): SpeechRecognition
     }
   }
 }
@@ -28,8 +76,13 @@ function App() {
   const [messages, setMessages, deleteMessages] = useKV<Message[]>('chat-messages', [])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [isProcessingAudio, setIsProcessingAudio] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -41,9 +94,36 @@ function App() {
     }
   }, [messages, isLoading])
 
-  // Focus input on mount
+  // Focus input on mount and initialize speech recognition
   useEffect(() => {
     inputRef.current?.focus()
+    
+    // Initialize Speech Recognition
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const recognition = new SpeechRecognition()
+      
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.lang = 'es-ES'
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript
+        setInputValue(prev => prev + transcript)
+        setIsRecording(false)
+      }
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error)
+        setIsRecording(false)
+      }
+      
+      recognition.onend = () => {
+        setIsRecording(false)
+      }
+      
+      setRecognition(recognition)
+    }
   }, [])
 
   const handleSendMessage = async () => {
@@ -107,6 +187,32 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
 
   const clearChat = () => {
     setMessages([])
+  }
+
+  const startRecording = () => {
+    if (!recognition) {
+      // Fallback: mostrar mensaje informativo
+      const fallbackMessage = 'La funcionalidad de voz no está disponible en este navegador. Por favor, escribe tu mensaje.'
+      console.warn('Speech recognition not supported')
+      
+      // Podrías mostrar un toast aquí si tienes la librería instalada
+      // toast.warning(fallbackMessage)
+      
+      return
+    }
+
+    if (isRecording) {
+      recognition.stop()
+      setIsRecording(false)
+    } else {
+      try {
+        recognition.start()
+        setIsRecording(true)
+      } catch (error) {
+        console.error('Error starting recognition:', error)
+        setIsRecording(false)
+      }
+    }
   }
 
   return (
@@ -203,15 +309,28 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Envía un mensaje..."
+                  placeholder={isRecording ? "Escuchando..." : "Envía un mensaje..."}
                   className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0 placeholder:text-muted-foreground resize-none"
                   disabled={isLoading}
                 />
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
-                <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
-                  <Microphone size={16} />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={`w-8 h-8 transition-colors ${
+                    !recognition 
+                      ? 'text-muted-foreground/50 cursor-not-allowed'
+                      : isRecording 
+                      ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 recording-pulse' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  onClick={startRecording}
+                  disabled={isLoading || !recognition}
+                  title={!recognition ? 'Función de voz no disponible en este navegador' : isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
+                >
+                  {isRecording ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
                 </Button>
                 
                 {inputValue.trim() ? (
