@@ -111,37 +111,9 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      {/* Header - minimalist like the reference */}
-      <div className="flex items-center justify-between p-4 border-b border-border/20">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="w-8 h-8">
-            <div className="grid grid-cols-2 gap-0.5 w-3 h-3">
-              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
-              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
-              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
-              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
-            </div>
-          </Button>
-          <Button variant="ghost" size="icon" className="w-8 h-8">
-            <span className="text-lg font-light">+</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="text-xs px-2 h-7 border border-border/30">
-            <span>🏨</span>
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="default" 
-            size="sm" 
-            className="bg-primary text-primary-foreground rounded-full px-4 h-8 text-sm font-medium"
-          >
-            Hola
-          </Button>
-          <Button variant="ghost" size="icon" className="w-8 h-8">
-            <Copy size={14} />
-          </Button>
-        </div>
+      {/* Header - simple title */}
+      <div className="flex items-center justify-center p-4 border-b border-border/20">
+        <h1 className="text-lg font-medium text-foreground">Asistente Hotel</h1>
       </div>
 
       {/* Main chat area */}
