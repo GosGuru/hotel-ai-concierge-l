@@ -78,11 +78,15 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessingAudio, setIsProcessingAudio] = useState(false)
+  const [audioLevel, setAudioLevel] = useState(0)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -116,13 +120,22 @@ function App() {
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error)
         setIsRecording(false)
+        stopAudioLevelMonitoring()
       }
       
       recognition.onend = () => {
         setIsRecording(false)
+        stopAudioLevelMonitoring()
       }
       
       setRecognition(recognition)
+    }
+  }, [])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAudioLevelMonitoring()
     }
   }, [])
 
@@ -189,7 +202,7 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
     setMessages([])
   }
 
-  const startRecording = () => {
+  const startRecording = async () => {
     if (!recognition) {
       // Fallback: mostrar mensaje informativo
       const fallbackMessage = 'La funcionalidad de voz no está disponible en este navegador. Por favor, escribe tu mensaje.'
@@ -204,8 +217,13 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
     if (isRecording) {
       recognition.stop()
       setIsRecording(false)
+      stopAudioLevelMonitoring()
     } else {
       try {
+        // Solicitar permisos de micrófono y configurar análisis de audio
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        setupAudioLevelMonitoring(stream)
+        
         recognition.start()
         setIsRecording(true)
       } catch (error) {
@@ -213,6 +231,57 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
         setIsRecording(false)
       }
     }
+  }
+
+  const setupAudioLevelMonitoring = (stream: MediaStream) => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const source = audioContext.createMediaStreamSource(stream)
+      const analyser = audioContext.createAnalyser()
+      
+      analyser.fftSize = 256
+      analyser.smoothingTimeConstant = 0.8
+      source.connect(analyser)
+      
+      audioContextRef.current = audioContext
+      analyserRef.current = analyser
+      
+      monitorAudioLevel()
+    } catch (error) {
+      console.error('Error setting up audio monitoring:', error)
+    }
+  }
+
+  const monitorAudioLevel = () => {
+    if (!analyserRef.current) return
+    
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount)
+    analyserRef.current.getByteFrequencyData(dataArray)
+    
+    // Calcular el nivel promedio de audio
+    const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length
+    const normalizedLevel = Math.min(average / 128, 1) // Normalizar a 0-1
+    
+    setAudioLevel(normalizedLevel)
+    
+    if (isRecording) {
+      animationFrameRef.current = requestAnimationFrame(monitorAudioLevel)
+    }
+  }
+
+  const stopAudioLevelMonitoring = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
+    
+    if (audioContextRef.current) {
+      audioContextRef.current.close()
+      audioContextRef.current = null
+    }
+    
+    analyserRef.current = null
+    setAudioLevel(0)
   }
 
   return (
@@ -316,22 +385,55 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className={`w-8 h-8 transition-colors ${
-                    !recognition 
-                      ? 'text-muted-foreground/50 cursor-not-allowed'
-                      : isRecording 
-                      ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 recording-pulse' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  onClick={startRecording}
-                  disabled={isLoading || !recognition}
-                  title={!recognition ? 'Función de voz no disponible en este navegador' : isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
-                >
-                  {isRecording ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
-                </Button>
+                <div className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={`w-8 h-8 transition-colors relative ${
+                      !recognition 
+                        ? 'text-muted-foreground/50 cursor-not-allowed'
+                        : isRecording 
+                        ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100' 
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                    onClick={startRecording}
+                    disabled={isLoading || !recognition}
+                    title={!recognition ? 'Función de voz no disponible en este navegador' : isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
+                  >
+                    {isRecording ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
+                    
+                    {/* Audio level indicator */}
+                    {isRecording && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
+                        <div 
+                          className="w-1 h-1 bg-white rounded-full transition-transform duration-100 audio-level-dot"
+                          style={{ 
+                            transform: `scale(${0.8 + audioLevel * 0.8})`,
+                            opacity: 0.8 + audioLevel * 0.2
+                          }}
+                        />
+                      </div>
+                    )}
+                  </Button>
+                  
+                  {/* Audio waveform visualization */}
+                  {isRecording && (
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex items-end gap-0.5 h-4">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="w-0.5 bg-red-400 rounded-full transition-all duration-100 wave-bar"
+                          style={{
+                            height: `${Math.max(4, (audioLevel * 12) + 4)}px`,
+                            opacity: 0.7 + audioLevel * 0.3,
+                            animationDelay: `${i * 80}ms`,
+                            animationDuration: `${400 + i * 100}ms`
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
                 
                 {inputValue.trim() ? (
                   <Button
