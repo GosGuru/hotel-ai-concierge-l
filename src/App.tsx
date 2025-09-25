@@ -180,25 +180,52 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      // Get response as text first to debug
+      // Parse N8N streaming response (JSONL format)
       const responseText = await response.text()
       console.log('N8N Response (raw):', responseText)
       
-      let data
+      // Parse streaming JSONL response
+      let assistantContent = ''
+      
       try {
-        data = JSON.parse(responseText)
-      } catch (jsonError) {
-        console.error('JSON Parse Error:', jsonError)
-        console.error('Response text:', responseText)
+        // Split by lines and parse each JSON object
+        const lines = responseText.trim().split('\n')
         
-        // If it's not JSON, maybe N8N is returning plain text
-        data = { response: responseText }
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const jsonData = JSON.parse(line)
+              
+              // Extract content from streaming data
+              if (jsonData.type === 'item' && jsonData.content) {
+                assistantContent += jsonData.content
+              }
+            } catch (lineError) {
+              console.warn('Could not parse line:', line, lineError)
+            }
+          }
+        }
+        
+        // Fallback: if no streaming content found, try parsing as single JSON
+        if (!assistantContent && responseText) {
+          try {
+            const singleData = JSON.parse(responseText)
+            assistantContent = singleData.response || singleData.message || singleData.text || ''
+          } catch {
+            // Final fallback: use raw text
+            assistantContent = responseText
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error parsing N8N response:', error)
+        assistantContent = 'Lo siento, no he podido procesar su consulta en este momento.'
       }
       
-      // Expect the N8N workflow to return a response message
+      // Create assistant message with parsed content
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response || data.message || data.text || responseText || 'Lo siento, no he podido procesar su consulta en este momento.',
+        content: assistantContent || 'Lo siento, no he podido procesar su consulta en este momento.',
         role: 'assistant',
         timestamp: Date.now() + 1
       }
