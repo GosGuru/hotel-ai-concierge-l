@@ -12,30 +12,30 @@
 }
 
 :root {
-  --background: oklch(0.98 0.005 250);
-  --foreground: oklch(0.15 0.02 250);
+  --background: oklch(0.08 0.005 240);
+  --foreground: oklch(0.95 0.005 240);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 250);
+  --card: oklch(0.12 0.01 240);
+  --card-foreground: oklch(0.95 0.005 240);
+  --popover: oklch(0.12 0.01 240);
+  --popover-foreground: oklch(0.95 0.005 240);
 
-  --primary: oklch(0.45 0.15 250);
-  --primary-foreground: oklch(0.98 0.005 250);
-  --secondary: oklch(0.96 0.01 250);
-  --secondary-foreground: oklch(0.15 0.02 250);
-  --accent: oklch(0.94 0.02 250);
-  --accent-foreground: oklch(0.15 0.02 250);
+  --primary: oklch(0.55 0.18 220);
+  --primary-foreground: oklch(0.98 0.005 240);
+  --secondary: oklch(0.15 0.01 240);
+  --secondary-foreground: oklch(0.95 0.005 240);
+  --accent: oklch(0.18 0.02 240);
+  --accent-foreground: oklch(0.95 0.005 240);
   --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(0.98 0.005 250);
+  --destructive-foreground: oklch(0.98 0.005 240);
 
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.45 0.02 250);
-  --border: oklch(0.92 0.015 250);
-  --input: oklch(0.92 0.015 250);
-  --ring: oklch(0.45 0.15 250);
+  --muted: oklch(0.15 0.01 240);
+  --muted-foreground: oklch(0.6 0.02 240);
+  --border: oklch(0.18 0.015 240);
+  --input: oklch(0.15 0.015 240);
+  --ring: oklch(0.55 0.18 220);
 
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 }
 
 @theme {
@@ -77,10 +77,18 @@
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb {
-  background: oklch(0.85 0.01 250);
+  background: oklch(0.25 0.01 240);
   border-radius: 2px;
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.75 0.02 250);
+  background: oklch(0.35 0.02 240);
+}
+
+/* Dark theme glass effect */
+.glass-effect {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: oklch(0.1 0.005 240 / 0.8);
+  border: 1px solid oklch(0.2 0.01 240 / 0.2);
 }

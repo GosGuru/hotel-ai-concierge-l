@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PaperPlaneTilt, User, Robot } from '@phosphor-icons/react'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, Paperclip } from '@phosphor-icons/react'
 
 // Declare spark global
 declare global {
@@ -66,14 +65,14 @@ function App() {
       // Create prompt for the AI
       const conversationHistory = (messages || []).slice(-10) // Keep last 10 messages for context
       const contextMessages = conversationHistory.map(msg => 
-        `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+        `${msg.role === 'user' ? 'Huésped' : 'Asistente'}: ${msg.content}`
       ).join('\n')
       
-      const prompt = window.spark.llmPrompt`You are a helpful AI assistant. Please respond to the user's message in a conversational and helpful way.
+      const prompt = window.spark.llmPrompt`Eres un asistente profesional de hotel de lujo. Responde de manera elegante, útil y profesional a las consultas de los huéspedes. Mantén un tono cordial pero sofisticado.
 
-${contextMessages ? `Previous conversation:\n${contextMessages}\n\n` : ''}Current user message: ${userMessage.content}
+${contextMessages ? `Conversación previa:\n${contextMessages}\n\n` : ''}Consulta actual del huésped: ${userMessage.content}
 
-Please provide a helpful, conversational response.`
+Por favor proporciona una respuesta profesional y útil como asistente de hotel.`
 
       const response = await window.spark.llm(prompt, 'gpt-4o')
 
@@ -89,7 +88,7 @@ Please provide a helpful, conversational response.`
       console.error('Error getting AI response:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error while processing your message. Please try again.',
+        content: 'Disculpe, he encontrado un error al procesar su consulta. Por favor, inténtelo nuevamente.',
         role: 'assistant',
         timestamp: Date.now() + 1
       }
@@ -111,127 +110,153 @@ Please provide a helpful, conversational response.`
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="flex items-center justify-between p-4 max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                <Robot size={16} weight="fill" />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="font-semibold text-foreground">AI Assistant</h1>
-              <p className="text-xs text-muted-foreground">Always here to help</p>
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      {/* Header - minimalist like the reference */}
+      <div className="flex items-center justify-between p-4 border-b border-border/20">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="w-8 h-8">
+            <div className="grid grid-cols-2 gap-0.5 w-3 h-3">
+              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
+              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
+              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
+              <div className="w-1 h-1 bg-current rounded-[1px]"></div>
             </div>
-          </div>
-          {(messages || []).length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearChat}
-              className="text-muted-foreground"
-            >
-              Clear Chat
-            </Button>
-          )}
+          </Button>
+          <Button variant="ghost" size="icon" className="w-8 h-8">
+            <span className="text-lg font-light">+</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="text-xs px-2 h-7 border border-border/30">
+            <span>🏨</span>
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="bg-primary text-primary-foreground rounded-full px-4 h-8 text-sm font-medium"
+          >
+            Hola
+          </Button>
+          <Button variant="ghost" size="icon" className="w-8 h-8">
+            <Copy size={14} />
+          </Button>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Main chat area */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea ref={scrollAreaRef} className="h-full chat-scrollbar">
-          <div className="max-w-4xl mx-auto p-4 space-y-4">
+          <div className="max-w-2xl mx-auto px-4">
             {(messages || []).length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-full p-4 mb-4">
-                  <Robot size={32} className="text-primary" weight="fill" />
+              <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center">
+                <div className="mb-6">
+                  <Sparkle size={24} className="text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold text-foreground mb-2">
-                  Welcome to AI Chat
-                </h2>
-                <p className="text-muted-foreground max-w-md">
-                  Start a conversation! I'm here to help answer questions, provide information, or just chat about whatever interests you.
-                </p>
+                <h1 className="text-xl font-medium text-foreground mb-2">
+                  ¡Hola! ¿En qué puedo ayudarte hoy?
+                </h1>
               </div>
             ) : (
-              (messages || []).map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-3 animate-in slide-in-from-bottom-2 duration-300 ${
-                    message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                  }`}
-                >
-                  <Avatar className="w-8 h-8 shrink-0">
-                    <AvatarFallback 
-                      className={message.role === 'user' 
-                        ? 'bg-secondary text-secondary-foreground' 
-                        : 'bg-primary text-primary-foreground'
-                      }
-                    >
-                      {message.role === 'user' ? (
-                        <User size={16} weight="fill" />
-                      ) : (
-                        <Robot size={16} weight="fill" />
-                      )}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Card 
-                    className={`max-w-[70%] p-3 ${
-                      message.role === 'user' 
-                        ? 'bg-primary text-primary-foreground ml-auto' 
-                        : 'bg-card text-card-foreground'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {message.content}
-                    </p>
-                  </Card>
-                </div>
-              ))
-            )}
-            
-            {/* Loading indicator */}
-            {isLoading && (
-              <div className="flex gap-3 animate-in slide-in-from-bottom-2 duration-300">
-                <Avatar className="w-8 h-8 shrink-0">
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    <Robot size={16} weight="fill" />
-                  </AvatarFallback>
-                </Avatar>
-                <Card className="max-w-[70%] p-3 bg-card text-card-foreground">
-                  <div className="space-y-2">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-3 w-24" />
+              <div className="py-8 space-y-6">
+                {(messages || []).map((message) => (
+                  <div key={message.id} className="animate-in slide-in-from-bottom-2 duration-300">
+                    {message.role === 'user' ? (
+                      <div className="flex justify-end mb-4">
+                        <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 max-w-[80%] text-sm">
+                          {message.content}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-3 mb-6">
+                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                          <Sparkle size={12} className="text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 space-y-3">
+                          <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                            {message.content}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
+                              <Copy size={14} />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
+                              <ThumbsUp size={14} />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
+                              <ThumbsDown size={14} />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </Card>
+                ))}
+                
+                {/* Loading indicator */}
+                {isLoading && (
+                  <div className="flex gap-3 mb-6 animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                      <Sparkle size={12} className="text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-3 w-16 bg-muted" />
+                      <Skeleton className="h-3 w-24 bg-muted" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </ScrollArea>
       </div>
 
-      {/* Input */}
-      <div className="border-t border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex gap-2">
-            <Input
-              ref={inputRef}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isLoading}
-              size="icon"
-              className="shrink-0"
-            >
-              <PaperPlaneTilt size={16} weight="fill" />
+      {/* Input area */}
+      <div className="p-4 pb-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
+            <div className="flex items-end gap-2 bg-card border border-border rounded-2xl p-3">
+              <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground shrink-0">
+                <Paperclip size={16} />
+              </Button>
+              
+              <div className="flex-1">
+                <Input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Envía un mensaje..."
+                  className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0 placeholder:text-muted-foreground resize-none"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
+                  <Microphone size={16} />
+                </Button>
+                
+                {inputValue.trim() ? (
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={isLoading}
+                    size="icon"
+                    className="w-8 h-8 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+                  >
+                    <ArrowUp size={16} />
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+          
+          {/* Model selector like in reference */}
+          <div className="flex items-center justify-center mt-3">
+            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-6 px-2 hover:text-foreground">
+              <Sparkle size={12} className="mr-1" />
+              Asistente Profesional
+              <span className="ml-2">⌄</span>
             </Button>
           </div>
         </div>
