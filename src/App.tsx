@@ -180,12 +180,25 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      // Get response as text first to debug
+      const responseText = await response.text()
+      console.log('N8N Response (raw):', responseText)
+      
+      let data
+      try {
+        data = JSON.parse(responseText)
+      } catch (jsonError) {
+        console.error('JSON Parse Error:', jsonError)
+        console.error('Response text:', responseText)
+        
+        // If it's not JSON, maybe N8N is returning plain text
+        data = { response: responseText }
+      }
       
       // Expect the N8N workflow to return a response message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response || data.message || 'Lo siento, no he podido procesar su consulta en este momento.',
+        content: data.response || data.message || data.text || responseText || 'Lo siento, no he podido procesar su consulta en este momento.',
         role: 'assistant',
         timestamp: Date.now() + 1
       }
