@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, Paperclip } from '@phosphor-icons/react'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, Paperclip, Buildings } from '@phosphor-icons/react'
 
 // Declare spark global
 declare global {
@@ -111,9 +111,14 @@ Por favor proporciona una respuesta profesional y útil como asistente de hotel.
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      {/* Header - simple title */}
+      {/* Header - hotel branding */}
       <div className="flex items-center justify-center p-4 border-b border-border/20">
-        <h1 className="text-lg font-medium text-foreground">Asistente Hotel</h1>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Buildings size={18} className="text-primary" />
+          </div>
+          <h1 className="text-lg font-medium text-foreground">Asistente Hotel</h1>
+        </div>
       </div>
 
       {/* Main chat area */}
