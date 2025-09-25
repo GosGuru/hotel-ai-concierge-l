@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, MicrophoneSlash, Paperclip, Buildings } from '@phosphor-icons/react'
+import hotelBackground from '@/assets/images/hotel-lobby.jpg'
 
 // Speech Recognition types
 interface SpeechRecognition extends EventTarget {
@@ -345,43 +346,22 @@ function App() {
         <div 
           className="w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('data:image/svg+xml;base64,${btoa(`
-              <svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="hotelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:#334155;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#475569;stop-opacity:1" />
-                  </linearGradient>
-                  <pattern id="hotelPattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-                    <rect width="200" height="200" fill="url(#hotelGrad)"/>
-                    <circle cx="50" cy="50" r="2" fill="#64748b" opacity="0.3"/>
-                    <circle cx="150" cy="100" r="1.5" fill="#64748b" opacity="0.2"/>
-                    <circle cx="100" cy="150" r="2.5" fill="#64748b" opacity="0.1"/>
-                    <rect x="20" y="20" width="40" height="60" fill="#475569" opacity="0.2" rx="2"/>
-                    <rect x="140" y="40" width="35" height="50" fill="#475569" opacity="0.15" rx="2"/>
-                    <rect x="70" y="120" width="45" height="55" fill="#475569" opacity="0.18" rx="2"/>
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#hotelPattern)"/>
-                <rect width="100%" height="100%" fill="url(#hotelGrad)" opacity="0.7"/>
-              </svg>
-            `)}`
+            backgroundImage: `url(${hotelBackground})`
           }}
         />
-        {/* Dark overlay for better readability */}
-        <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]" />
+        {/* Gradient overlay for better readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/85 to-background/80 backdrop-blur-[1px]" />
       </div>
 
       {/* Content */}
       <div className="flex flex-col h-full relative z-10">
       {/* Header - hotel branding */}
-      <div className="flex items-center justify-center p-4 border-b border-border/20">
+      <div className="flex items-center justify-center p-4 border-b border-border/30 bg-card/60 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Buildings size={18} className="text-primary" />
+          <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shadow-sm">
+            <Buildings size={20} className="text-primary" />
           </div>
-          <h1 className="text-lg font-medium text-foreground">Asistente Hotel</h1>
+          <h1 className="text-xl font-semibold text-foreground">Asistente Hotel</h1>
         </div>
       </div>
 
@@ -456,7 +436,7 @@ function App() {
       <div className="p-4 pb-6">
         <div className="max-w-2xl mx-auto">
           <div className="relative">
-            <div className="flex items-end gap-2 bg-card/80 backdrop-blur-sm border border-border rounded-2xl p-3">
+            <div className="flex items-end gap-2 bg-card/90 backdrop-blur-md border border-border/40 rounded-2xl p-3 shadow-lg">
               <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground shrink-0">
                 <Paperclip size={16} />
               </Button>
