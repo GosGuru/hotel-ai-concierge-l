@@ -168,7 +168,7 @@ function App() {
       }
 
       // Send to N8N webhook
-      const response = await fetch('https://n8n-n8n.ua4qkv.easypanel.host/webhook-test/8cc93673-7b91-4992-aca5-834c8e66890a', {
+      const response = await fetch('https://n8n-n8n.ua4qkv.easypanel.host/webhook/8cc93673-7b91-4992-aca5-834c8e66890a', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
