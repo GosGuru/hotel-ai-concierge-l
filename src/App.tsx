@@ -341,94 +341,94 @@ function App() {
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       {/* Header - hotel branding matching the image */}
-      <div className="flex items-center justify-center p-4 sm:p-6 border-b border-border bg-background">
+      <div className="flex items-center justify-center p-3 sm:p-4 border-b border-border bg-background">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary flex items-center justify-center shadow-sm">
-            <Buildings size={16} className="text-primary-foreground sm:hidden" weight="bold" />
-            <Buildings size={24} className="text-primary-foreground hidden sm:block" weight="bold" />
+          <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary flex items-center justify-center shadow-sm">
+            <Buildings size={14} className="text-primary-foreground sm:hidden" weight="bold" />
+            <Buildings size={20} className="text-primary-foreground hidden sm:block" weight="bold" />
           </div>
-          <h1 className="text-lg sm:text-2xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
+          <h1 className="text-base sm:text-xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
         </div>
       </div>
       {/* Main chat area */}
       <div className="flex-1 overflow-hidden bg-background">
         <ScrollArea ref={scrollAreaRef} className="h-full">
-          <div className="max-w-sm sm:max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="w-full max-w-full px-3 sm:px-4 py-4 sm:py-6">
             {(messages || []).length === 0 ? (
-              <div className="flex flex-col items-start justify-center h-full min-h-[60vh]">
+              <div className="flex flex-col items-start justify-center h-full min-h-[60vh] max-w-full">
                 {/* Welcome message matching the image */}
-                <div className="mb-6 sm:mb-8">
-                  <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
-                    <div className="text-xl sm:text-2xl">
-                      <Hand size={24} className="text-primary sm:hidden" weight="fill" />
-                      <Hand size={28} className="text-primary hidden sm:block" weight="fill" />
+                <div className="mb-4 sm:mb-6 w-full">
+                  <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+                    <div className="text-xl sm:text-2xl shrink-0">
+                      <Hand size={20} className="text-primary sm:hidden" weight="fill" />
+                      <Hand size={24} className="text-primary hidden sm:block" weight="fill" />
                     </div>
-                    <div className="text-sm sm:text-base leading-relaxed text-foreground">
-                      <p className="mb-3 sm:mb-4">
+                    <div className="text-sm sm:text-base leading-relaxed text-foreground flex-1 min-w-0">
+                      <p className="mb-2 sm:mb-3">
                         Hola! Soy tu asistente digital 24/7. Puedo ayudarte con dudas, recomendaciones locales y funcionamiento.
                       </p>
                     </div>
                   </div>
                   
                   {/* Predefined questions */}
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-3 sm:mb-4">
+                  <div className="space-y-2 w-full">
+                    <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-2 sm:mb-3">
                       Preguntas frecuentes:
                     </p>
-                    <div className="grid gap-2 sm:gap-3">
+                    <div className="grid gap-2 w-full">
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
+                        className="justify-start text-left h-auto p-2.5 sm:p-3 bg-card hover:bg-muted border-border rounded-lg sm:rounded-xl text-xs sm:text-sm w-full"
                         onClick={() => setInputValue('¿Cuál es la clave wifi?')}
                       >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="text-primary">
-                            <CaretRight size={14} className="sm:hidden" weight="bold" />
-                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
+                        <div className="flex items-center gap-2 w-full min-w-0">
+                          <div className="text-primary shrink-0">
+                            <CaretRight size={12} className="sm:hidden" weight="bold" />
+                            <CaretRight size={14} className="hidden sm:block" weight="bold" />
                           </div>
-                          <span className="text-foreground">¿Cuál es la clave wifi?</span>
+                          <span className="text-foreground truncate">¿Cuál es la clave wifi?</span>
                         </div>
                       </Button>
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
+                        className="justify-start text-left h-auto p-2.5 sm:p-3 bg-card hover:bg-muted border-border rounded-lg sm:rounded-xl text-xs sm:text-sm w-full"
                         onClick={() => setInputValue('¿Cuáles son los horarios de desayunos, comidas y cenas?')}
                       >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="text-primary">
-                            <CaretRight size={14} className="sm:hidden" weight="bold" />
-                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
+                        <div className="flex items-center gap-2 w-full min-w-0">
+                          <div className="text-primary shrink-0">
+                            <CaretRight size={12} className="sm:hidden" weight="bold" />
+                            <CaretRight size={14} className="hidden sm:block" weight="bold" />
                           </div>
-                          <span className="text-foreground">¿Cuáles son los horarios de desayunos, comidas y cenas?</span>
+                          <span className="text-foreground truncate">¿Cuáles son los horarios de desayunos, comidas y cenas?</span>
                         </div>
                       </Button>
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
+                        className="justify-start text-left h-auto p-2.5 sm:p-3 bg-card hover:bg-muted border-border rounded-lg sm:rounded-xl text-xs sm:text-sm w-full"
                         onClick={() => setInputValue('Necesito la guía de transporte público')}
                       >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="text-primary">
-                            <CaretRight size={14} className="sm:hidden" weight="bold" />
-                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
+                        <div className="flex items-center gap-2 w-full min-w-0">
+                          <div className="text-primary shrink-0">
+                            <CaretRight size={12} className="sm:hidden" weight="bold" />
+                            <CaretRight size={14} className="hidden sm:block" weight="bold" />
                           </div>
-                          <span className="text-foreground">Necesito la guía de transporte público</span>
+                          <span className="text-foreground truncate">Necesito la guía de transporte público</span>
                         </div>
                       </Button>
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
+                        className="justify-start text-left h-auto p-2.5 sm:p-3 bg-card hover:bg-muted border-border rounded-lg sm:rounded-xl text-xs sm:text-sm w-full"
                         onClick={() => setInputValue('Restaurantes recomendados cercanos')}
                       >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="text-primary">
-                            <CaretRight size={14} className="sm:hidden" weight="bold" />
-                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
+                        <div className="flex items-center gap-2 w-full min-w-0">
+                          <div className="text-primary shrink-0">
+                            <CaretRight size={12} className="sm:hidden" weight="bold" />
+                            <CaretRight size={14} className="hidden sm:block" weight="bold" />
                           </div>
-                          <span className="text-foreground">Restaurantes recomendados cercanos</span>
+                          <span className="text-foreground truncate">Restaurantes recomendados cercanos</span>
                         </div>
                       </Button>
                     </div>
@@ -436,37 +436,37 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-4 w-full max-w-full">
                 {(messages || []).map((message) => (
-                  <div key={message.id} className="animate-in slide-in-from-bottom-2 duration-300">
+                  <div key={message.id} className="animate-in slide-in-from-bottom-2 duration-300 w-full">
                     {message.role === 'user' ? (
-                      <div className="flex justify-end mb-3 sm:mb-4">
-                        <div className="bg-primary text-primary-foreground rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 max-w-[85%] text-sm sm:text-base">
+                      <div className="flex justify-end w-full px-0">
+                        <div className="bg-primary text-primary-foreground rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 max-w-[85%] text-sm sm:text-base break-words">
                           {message.content}
                         </div>
                       </div>
                     ) : (
-                      <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                          <Sparkle size={12} className="text-muted-foreground sm:hidden" weight="fill" />
-                          <Sparkle size={16} className="text-muted-foreground hidden sm:block" weight="fill" />
+                      <div className="flex gap-2 sm:gap-3 w-full px-0">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
+                          <Sparkle size={10} className="text-muted-foreground sm:hidden" weight="fill" />
+                          <Sparkle size={12} className="text-muted-foreground hidden sm:block" weight="fill" />
                         </div>
-                        <div className="flex-1 space-y-2 sm:space-y-3">
-                          <div className="text-sm sm:text-base leading-relaxed text-foreground whitespace-pre-wrap">
+                        <div className="flex-1 space-y-1 sm:space-y-2 min-w-0">
+                          <div className="text-sm sm:text-base leading-relaxed text-foreground whitespace-pre-wrap break-words">
                             {message.content}
                           </div>
-                          <div className="flex items-center gap-1 sm:gap-2">
-                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
-                              <Copy size={12} className="sm:hidden" />
-                              <Copy size={16} className="hidden sm:block" />
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground hover:text-foreground">
+                              <Copy size={10} className="sm:hidden" />
+                              <Copy size={12} className="hidden sm:block" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
-                              <ThumbsUp size={12} className="sm:hidden" />
-                              <ThumbsUp size={16} className="hidden sm:block" />
+                            <Button variant="ghost" size="icon" className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground hover:text-foreground">
+                              <ThumbsUp size={10} className="sm:hidden" />
+                              <ThumbsUp size={12} className="hidden sm:block" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
-                              <ThumbsDown size={12} className="sm:hidden" />  
-                              <ThumbsDown size={16} className="hidden sm:block" />
+                            <Button variant="ghost" size="icon" className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground hover:text-foreground">
+                              <ThumbsDown size={10} className="sm:hidden" />  
+                              <ThumbsDown size={12} className="hidden sm:block" />
                             </Button>
                           </div>
                         </div>
@@ -477,14 +477,14 @@ function App() {
                 
                 {/* Loading indicator */}
                 {isLoading && (
-                  <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6 animate-in slide-in-from-bottom-2 duration-300">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                      <Sparkle size={12} className="text-muted-foreground animate-pulse sm:hidden" weight="fill" />
-                      <Sparkle size={16} className="text-muted-foreground animate-pulse hidden sm:block" weight="fill" />
+                  <div className="flex gap-2 sm:gap-3 w-full px-0 animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5 sm:mt-1">
+                      <Sparkle size={10} className="text-muted-foreground animate-pulse sm:hidden" weight="fill" />
+                      <Sparkle size={12} className="text-muted-foreground animate-pulse hidden sm:block" weight="fill" />
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-3 sm:h-4 w-16 sm:w-20 bg-muted" />
-                      <Skeleton className="h-3 sm:h-4 w-24 sm:w-32 bg-muted" />
+                    <div className="flex-1 space-y-1 sm:space-y-2 min-w-0">
+                      <Skeleton className="h-3 sm:h-4 w-14 sm:w-16 bg-muted" />
+                      <Skeleton className="h-3 sm:h-4 w-20 sm:w-24 bg-muted" />
                     </div>
                   </div>
                 )}
@@ -494,29 +494,29 @@ function App() {
         </ScrollArea>
       </div>
       {/* Input area matching the image */}
-      <div className="p-4 sm:p-6 pb-6 sm:pb-8 bg-background">
-        <div className="max-w-sm sm:max-w-md mx-auto">
-          <div className="relative">
-            <div className="flex items-center gap-2 sm:gap-3 bg-background border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4">
-              <div className="flex-1">
+      <div className="p-3 sm:p-4 pb-4 sm:pb-6 bg-background">
+        <div className="w-full max-w-full px-0">
+          <div className="relative w-full">
+            <div className="flex items-center gap-2 bg-background border border-border rounded-lg sm:rounded-xl p-2.5 sm:p-3 w-full">
+              <div className="flex-1 min-w-0">
                 <Input
                   ref={inputRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu consulta..."
-                  className="border-0 p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground bg-transparent"
+                  className="border-0 p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground bg-transparent w-full"
                   disabled={isLoading}
                 />
               </div>
 
-              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
                 {/* Voice recording button */}
                 <div className="relative">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors relative rounded-full ${ 
+                    className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors relative rounded-full ${ 
                       !recognition 
                         ? 'text-muted-foreground/50 cursor-not-allowed'
                         : isRecording 
@@ -529,21 +529,21 @@ function App() {
                   >
                     {isRecording ? (
                       <>
-                        <MicrophoneSlash size={16} className="sm:hidden" />
-                        <MicrophoneSlash size={20} className="hidden sm:block" />
+                        <MicrophoneSlash size={14} className="sm:hidden" />
+                        <MicrophoneSlash size={16} className="hidden sm:block" />
                       </>
                     ) : (
                       <>
-                        <Microphone size={16} className="sm:hidden" />
-                        <Microphone size={20} className="hidden sm:block" />
+                        <Microphone size={14} className="sm:hidden" />
+                        <Microphone size={16} className="hidden sm:block" />
                       </>
                     )}
                     
                     {/* Audio level indicator */}
                     {isRecording && (
-                      <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 flex items-center justify-center">
+                      <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 flex items-center justify-center">
                         <div 
-                          className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full transition-transform duration-100 audio-level-dot"
+                          className="w-0.5 h-0.5 sm:w-1 sm:h-1 bg-white rounded-full transition-transform duration-100 audio-level-dot"
                           style={{ 
                             transform: `scale(${0.8 + audioLevel * 0.8})`,
                             opacity: 0.8 + audioLevel * 0.2
@@ -555,13 +555,13 @@ function App() {
                   
                   {/* Audio waveform visualization */}
                   {isRecording && (
-                    <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex items-end gap-0.5 h-3 sm:h-4">
+                    <div className="absolute -bottom-5 sm:-bottom-6 left-1/2 transform -translate-x-1/2 flex items-end gap-0.5 h-2.5 sm:h-3">
                       {[...Array(5)].map((_, i) => (
                         <div
                           key={i}
                           className="w-0.5 bg-red-400 rounded-full transition-all duration-100 wave-bar"
                           style={{
-                            height: `${Math.max(3, (audioLevel * 10) + 3)}px`,
+                            height: `${Math.max(2, (audioLevel * 8) + 2)}px`,
                             opacity: 0.7 + audioLevel * 0.3,
                             animationDelay: `${i * 80}ms`,
                             animationDuration: `${400 + i * 100}ms`
@@ -577,10 +577,10 @@ function App() {
                   onClick={handleSendMessage}
                   disabled={isLoading || !inputValue.trim()}
                   size="icon"
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full disabled:opacity-50"
+                  className="w-7 h-7 sm:w-8 sm:h-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full disabled:opacity-50"
                 >
-                  <CaretRight size={16} className="sm:hidden" weight="bold" />
-                  <CaretRight size={20} className="hidden sm:block" weight="bold" />
+                  <CaretRight size={14} className="sm:hidden" weight="bold" />
+                  <CaretRight size={16} className="hidden sm:block" weight="bold" />
                 </Button>
               </div>
             </div>
