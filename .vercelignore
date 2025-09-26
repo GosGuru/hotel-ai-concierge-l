@@ -1,0 +1,10 @@
+node_modules
+bun.lockb  
+*.log
+.env.local
+.env.*.local
+.git
+.gitignore
+README.md
+.vscode
+.DS_Store
