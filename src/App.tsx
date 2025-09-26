@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -15,6 +14,39 @@ interface Message {
   content: string
   role: 'user' | 'assistant'
   timestamp: number
+}
+
+// Simple localStorage hook to replace GitHub Spark's useKV
+function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: T | ((prev: T) => T)) => void, () => void] {
+  const [value, setValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? JSON.parse(item) : defaultValue
+    } catch {
+      return defaultValue
+    }
+  })
+
+  const setStoredValue = (newValue: T | ((prev: T) => T)) => {
+    try {
+      const valueToStore = newValue instanceof Function ? newValue(value) : newValue
+      setValue(valueToStore)
+      window.localStorage.setItem(key, JSON.stringify(valueToStore))
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error)
+    }
+  }
+
+  const deleteStoredValue = () => {
+    try {
+      window.localStorage.removeItem(key)
+      setValue(defaultValue)
+    } catch (error) {
+      console.error(`Error deleting localStorage key "${key}":`, error)
+    }
+  }
+
+  return [value, setStoredValue, deleteStoredValue]
 }
 
 // Helper function to format message content with bold text
@@ -43,7 +75,7 @@ const formatMessageContent = (content: string) => {
 };
 
 function App() {
-  const [messages, setMessages, deleteMessages] = useKV<Message[]>('chat-messages', [])
+  const [messages, setMessages, deleteMessages] = useLocalStorage<Message[]>('chat-messages', [])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
