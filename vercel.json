@@ -3,7 +3,7 @@
   "framework": "vite",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
-  "installCommand": "npm install --include=optional && npm install @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu",
+  "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
   }
