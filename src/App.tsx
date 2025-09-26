@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Paperclip, Buildings, CaretRight, Hand, Check } from '@phosphor-icons/react'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Paperclip, Buildings, CaretRight, Hand, Check, Trash, X } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 
@@ -49,6 +49,7 @@ function App() {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
+  const [showClearModal, setShowClearModal] = useState(false)
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -193,19 +194,25 @@ function App() {
 
   const clearChat = () => {
     setMessages([])
+    setShowClearModal(false)
+  }
+
+  const handleClearClick = () => {
+    setShowClearModal(true)
   }
 
 
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className="relative flex flex-col h-screen overflow-hidden bg-background text-foreground">
       {/* Header - hotel branding matching the image */}
       <motion.div 
-        className="flex items-center justify-center p-3 sm:p-4 bg-background"
+        className="flex items-center justify-between flex-shrink-0 p-3 border-b sm:p-4 bg-background/95 backdrop-blur-sm border-border/50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
+        <div className="flex-1" />
         <motion.div 
           className="flex items-center gap-2 sm:gap-3"
           initial={{ scale: 0.8, opacity: 0 }}
@@ -230,11 +237,37 @@ function App() {
             Asistente Villa Sardinero
           </motion.h1>
         </motion.div>
+        
+        {/* Clear chat button - only show if there are messages */}
+        <motion.div 
+          className="flex justify-end flex-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: (messages || []).length > 0 ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {(messages || []).length > 0 && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={handleClearClick}
+                title="Limpiar conversación"
+              >
+                <Trash size={16} />
+              </Button>
+            </motion.div>
+          )}
+        </motion.div>
       </motion.div>
       {/* Main chat area */}
-      <div className="flex-1 overflow-hidden bg-background">
+      <div className="flex-1 min-h-0 overflow-hidden bg-background">
         <ScrollArea ref={scrollAreaRef} className="h-full">
-          <div className="w-full max-w-md px-3 py-4 mx-auto sm:py-6">
+          <div className="w-full max-w-md min-h-full px-3 py-4 mx-auto sm:py-6">
             {(messages || []).length === 0 ? (
               <motion.div 
                 className="flex flex-col justify-center h-full min-h-[60vh] space-y-4"
@@ -541,14 +574,16 @@ function App() {
       </div>
       {/* Input area matching the image */}
       <motion.div 
-        className="p-3 pb-8 sm:p-4 sm:pb-10 bg-background safe-area-inset-bottom mobile-input-area"
+        className="flex-shrink-0 p-3 pb-8 border-t sm:p-4 sm:pb-10 bg-background/95 backdrop-blur-sm border-border/50 safe-area-inset-bottom mobile-input-area"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
         style={{ 
           paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))',
-          marginBottom: 'env(keyboard-inset-height, 0px)'
-        }}
+          marginBottom: 'env(keyboard-inset-height, 0px)',
+          position: 'relative',
+          zIndex: 10
+        } as React.CSSProperties}
       >
         <div className="w-full max-w-md px-3 mx-auto">
           <div className="relative w-full input-container">
@@ -610,6 +645,63 @@ function App() {
           </div>
         </div>
       </motion.div>
+
+      {/* Clear Chat Modal */}
+      <AnimatePresence>
+        {showClearModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowClearModal(false)}
+          >
+            <motion.div
+              className="w-full max-w-sm p-6 border shadow-2xl bg-background border-border rounded-2xl"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10">
+                  <Trash size={20} className="text-destructive" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Limpiar conversación
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Esta acción no se puede deshacer
+                  </p>
+                </div>
+              </div>
+              
+              <p className="mb-6 text-sm text-muted-foreground">
+                ¿Estás seguro de que deseas eliminar todos los mensajes de la conversación?
+              </p>
+              
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowClearModal(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={clearChat}
+                >
+                  Eliminar todo
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
