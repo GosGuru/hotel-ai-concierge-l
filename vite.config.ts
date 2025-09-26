@@ -29,7 +29,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-scroll-area', '@radix-ui/react-button']
+          ui: ['@radix-ui/react-scroll-area', 'framer-motion'],
+          icons: ['@phosphor-icons/react']
         }
       }
     }
