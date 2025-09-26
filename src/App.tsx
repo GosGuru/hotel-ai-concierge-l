@@ -65,19 +65,9 @@ function App() {
     inputRef.current?.focus()
   }, [])
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
+  const sendMessageToAI = async (messageContent: string) => {
+    if (!messageContent.trim() || isLoading) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: inputValue.trim(),
-      role: 'user',
-      timestamp: Date.now()
-    }
-
-    // Add user message immediately
-    setMessages(currentMessages => [...(currentMessages || []), userMessage])
-    setInputValue('')
     setIsLoading(true)
 
     try {
@@ -86,7 +76,7 @@ function App() {
       
       // Prepare payload for N8N webhook
       const payload = {
-        message: userMessage.content,
+        message: messageContent.trim(),
         role: 'user',
         timestamp: Date.now(),
         sessionId: 'hotel-chat-session', // You can make this dynamic per user
@@ -173,6 +163,25 @@ function App() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: inputValue.trim(),
+      role: 'user',
+      timestamp: Date.now()
+    }
+
+    // Add user message immediately
+    setMessages(currentMessages => [...(currentMessages || []), userMessage])
+    const messageToSend = inputValue.trim()
+    setInputValue('')
+    
+    // Send to AI
+    await sendMessageToAI(messageToSend)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -304,7 +313,27 @@ function App() {
                           <Button
                             variant="ghost"
                             className="justify-start w-full h-auto p-3 overflow-hidden text-sm text-left transition-all duration-200 bg-muted/30 hover:bg-muted/50 rounded-xl hover:shadow-sm"
-                            onClick={() => setInputValue(question)}
+                            onClick={async () => {
+                              // Show the question in input briefly
+                              setInputValue(question)
+                              
+                              // Auto-send after short delay
+                              setTimeout(async () => {
+                                const userMessage: Message = {
+                                  id: Date.now().toString(),
+                                  content: question,
+                                  role: 'user',
+                                  timestamp: Date.now()
+                                }
+                                
+                                // Add user message immediately
+                                setMessages(currentMessages => [...(currentMessages || []), userMessage])
+                                setInputValue('')
+                                
+                                // Send to AI
+                                await sendMessageToAI(question)
+                              }, 300)
+                            }}
                           >
                             <div className="flex items-start w-full gap-3 overflow-hidden">
                               <motion.div 
@@ -512,13 +541,17 @@ function App() {
       </div>
       {/* Input area matching the image */}
       <motion.div 
-        className="p-3 pb-4 sm:p-4 sm:pb-6 bg-background"
+        className="p-3 pb-8 sm:p-4 sm:pb-10 bg-background safe-area-inset-bottom mobile-input-area"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
+        style={{ 
+          paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))',
+          marginBottom: 'env(keyboard-inset-height, 0px)'
+        }}
       >
         <div className="w-full max-w-md px-3 mx-auto">
-          <div className="relative w-full">
+          <div className="relative w-full input-container">
             <motion.div 
               className="flex items-center w-full gap-2 p-3 transition-all duration-200 bg-white border border-border rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20"
               whileHover={{ scale: 1.005 }}

@@ -213,3 +213,48 @@ button, input, [role="button"] {
     0 4px 6px rgba(0, 0, 0, 0.1),
     0 2px 4px rgba(0, 0, 0, 0.06);
 }
+
+/* iOS Safe Area Support */
+@supports (padding: max(0px)) {
+  .safe-area-inset-bottom {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS Specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific styles */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Prevent zooming on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Fix iOS keyboard overlap */
+  .input-container {
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Mobile viewport fixes */
+@media screen and (max-width: 768px) {
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
+  
+  /* Additional bottom padding for mobile devices */
+  .mobile-input-area {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom, 2rem));
+    margin-bottom: env(keyboard-inset-height, 0px);
+  }
+}
