@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, MicrophoneSlash, Paperclip, Buildings } from '@phosphor-icons/react'
-import hotelBackground from '@/assets/images/hotel-lobby.jpg'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Microphone, MicrophoneSlash, Paperclip, Buildings, CaretRight, Hand } from '@phosphor-icons/react'
 
 // Speech Recognition types
 interface SpeechRecognition extends EventTarget {
@@ -340,72 +339,72 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Background image with overlay */}
-      <div className="absolute inset-0 z-0">
-        <div 
-          className="w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${hotelBackground})`
-          }}
-        />
-        {/* Gradient overlay for better readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/85 to-background/80 backdrop-blur-[1px]" />
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col h-full relative z-10">
-      {/* Header - hotel branding */}
-      <div className="flex items-center justify-center p-4 border-b border-border/30 bg-card/60 backdrop-blur-md">
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      {/* Header - hotel branding matching the image */}
+      <div className="flex items-center justify-center p-6 border-b border-border bg-background">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shadow-sm">
-            <Buildings size={20} className="text-primary" />
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-sm">
+            <Buildings size={24} className="text-primary-foreground" weight="bold" />
           </div>
-          <h1 className="text-xl font-semibold text-foreground">Asistente Hotel</h1>
+          <h1 className="text-2xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
         </div>
       </div>
 
       {/* Main chat area */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea ref={scrollAreaRef} className="h-full chat-scrollbar">
-          <div className="max-w-2xl mx-auto px-4">
+      <div className="flex-1 overflow-hidden bg-background">
+        <ScrollArea ref={scrollAreaRef} className="h-full">
+          <div className="max-w-md mx-auto px-6 py-8">
             {(messages || []).length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center">
-                <div className="mb-6">
-                  <Sparkle size={24} className="text-muted-foreground" />
+              <div className="flex flex-col items-start justify-center h-full min-h-[60vh]">
+                {/* Welcome message matching the image */}
+                <div className="mb-8">
+                  <div className="flex items-start gap-3 mb-6">
+                    <div className="text-2xl">
+                      <Hand size={28} className="text-primary" weight="fill" />
+                    </div>
+                    <div className="text-base leading-relaxed text-foreground">
+                      <p className="mb-4">
+                        Hola! Soy tu asistente digital 24/7. Puedo ayudarte con dudas, recomendaciones locales y funcionamiento.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Suggested question */}
+                  <div className="bg-muted rounded-2xl p-4 text-center">
+                    <p className="text-foreground font-medium">
+                      Dudas sobre tu estancia
+                    </p>
+                  </div>
                 </div>
-                <h1 className="text-xl font-medium text-foreground mb-2">
-                  ¡Hola! ¿En qué puedo ayudarte hoy?
-                </h1>
               </div>
             ) : (
-              <div className="py-8 space-y-6">
+              <div className="space-y-6">
                 {(messages || []).map((message) => (
                   <div key={message.id} className="animate-in slide-in-from-bottom-2 duration-300">
                     {message.role === 'user' ? (
                       <div className="flex justify-end mb-4">
-                        <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 max-w-[80%] text-sm">
+                        <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-3 max-w-[85%] text-base">
                           {message.content}
                         </div>
                       </div>
                     ) : (
                       <div className="flex gap-3 mb-6">
-                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                          <Sparkle size={12} className="text-muted-foreground" />
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                          <Sparkle size={16} className="text-muted-foreground" weight="fill" />
                         </div>
                         <div className="flex-1 space-y-3">
-                          <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                          <div className="text-base leading-relaxed text-foreground whitespace-pre-wrap">
                             {message.content}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
-                              <Copy size={14} />
+                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
+                              <Copy size={16} />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
-                              <ThumbsUp size={14} />
+                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
+                              <ThumbsUp size={16} />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-6 h-6 text-muted-foreground hover:text-foreground">
-                              <ThumbsDown size={14} />
+                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
+                              <ThumbsDown size={16} />
                             </Button>
                           </div>
                         </div>
@@ -417,12 +416,12 @@ function App() {
                 {/* Loading indicator */}
                 {isLoading && (
                   <div className="flex gap-3 mb-6 animate-in slide-in-from-bottom-2 duration-300">
-                    <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                      <Sparkle size={12} className="text-muted-foreground" />
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                      <Sparkle size={16} className="text-muted-foreground animate-pulse" weight="fill" />
                     </div>
                     <div className="flex-1 space-y-2">
-                      <Skeleton className="h-3 w-16 bg-muted" />
-                      <Skeleton className="h-3 w-24 bg-muted" />
+                      <Skeleton className="h-4 w-20 bg-muted" />
+                      <Skeleton className="h-4 w-32 bg-muted" />
                     </div>
                   </div>
                 )}
@@ -432,50 +431,47 @@ function App() {
         </ScrollArea>
       </div>
 
-      {/* Input area */}
-      <div className="p-4 pb-6">
-        <div className="max-w-2xl mx-auto">
+      {/* Input area matching the image */}
+      <div className="p-6 pb-8 bg-background">
+        <div className="max-w-md mx-auto">
           <div className="relative">
-            <div className="flex items-end gap-2 bg-card/90 backdrop-blur-md border border-border/40 rounded-2xl p-3 shadow-lg">
-              <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground shrink-0">
-                <Paperclip size={16} />
-              </Button>
-              
+            <div className="flex items-center gap-3 bg-input border border-border rounded-2xl p-4 shadow-sm">
               <div className="flex-1">
                 <Input
                   ref={inputRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={isRecording ? "Escuchando..." : "Envía un mensaje..."}
-                  className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0 placeholder:text-muted-foreground resize-none"
+                  placeholder="Escribe tu consulta..."
+                  className="border-0 bg-transparent p-0 text-base focus-visible:ring-0 placeholder:text-muted-foreground"
                   disabled={isLoading}
                 />
               </div>
 
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Voice recording button */}
                 <div className="relative">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className={`w-8 h-8 transition-colors relative ${
+                    className={`w-10 h-10 transition-colors relative rounded-full ${ 
                       !recognition 
                         ? 'text-muted-foreground/50 cursor-not-allowed'
                         : isRecording 
                         ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                     onClick={startRecording}
                     disabled={isLoading || !recognition}
                     title={!recognition ? 'Función de voz no disponible en este navegador' : isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
                   >
-                    {isRecording ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
+                    {isRecording ? <MicrophoneSlash size={20} /> : <Microphone size={20} />}
                     
                     {/* Audio level indicator */}
                     {isRecording && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
                         <div 
-                          className="w-1 h-1 bg-white rounded-full transition-transform duration-100 audio-level-dot"
+                          className="w-1.5 h-1.5 bg-white rounded-full transition-transform duration-100 audio-level-dot"
                           style={{ 
                             transform: `scale(${0.8 + audioLevel * 0.8})`,
                             opacity: 0.8 + audioLevel * 0.2
@@ -504,23 +500,19 @@ function App() {
                   )}
                 </div>
                 
-                {inputValue.trim() ? (
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={isLoading}
-                    size="icon"
-                    className="w-8 h-8 bg-foreground text-background hover:bg-foreground/90 rounded-full"
-                  >
-                    <ArrowUp size={16} />
-                  </Button>
-                ) : null}
+                {/* Send button */}
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={isLoading || !inputValue.trim()}
+                  size="icon"
+                  className="w-10 h-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full disabled:opacity-50"
+                >
+                  <CaretRight size={20} weight="bold" />
+                </Button>
               </div>
             </div>
           </div>
-          
-
         </div>
-      </div>
       </div>
     </div>
   )

@@ -12,30 +12,32 @@
 }
 
 :root {
-  --background: oklch(0.08 0.005 240);
-  --foreground: oklch(0.95 0.005 240);
+  /* Light theme like the image */
+  --background: oklch(0.98 0.005 0);
+  --foreground: oklch(0.15 0.01 0);
 
-  --card: oklch(0.12 0.01 240);
-  --card-foreground: oklch(0.95 0.005 240);
-  --popover: oklch(0.12 0.01 240);
-  --popover-foreground: oklch(0.95 0.005 240);
+  --card: oklch(0.95 0.005 0);
+  --card-foreground: oklch(0.15 0.01 0);
+  --popover: oklch(0.95 0.005 0);
+  --popover-foreground: oklch(0.15 0.01 0);
 
-  --primary: oklch(0.55 0.18 220);
-  --primary-foreground: oklch(0.98 0.005 240);
-  --secondary: oklch(0.15 0.01 240);
-  --secondary-foreground: oklch(0.95 0.005 240);
-  --accent: oklch(0.18 0.02 240);
-  --accent-foreground: oklch(0.95 0.005 240);
+  /* Blue color from hotel icon in image */
+  --primary: oklch(0.55 0.15 230);
+  --primary-foreground: oklch(0.98 0.005 0);
+  --secondary: oklch(0.92 0.005 0);
+  --secondary-foreground: oklch(0.15 0.01 0);
+  --accent: oklch(0.55 0.15 230);
+  --accent-foreground: oklch(0.98 0.005 0);
   --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(0.98 0.005 240);
+  --destructive-foreground: oklch(0.98 0.005 0);
 
-  --muted: oklch(0.15 0.01 240);
-  --muted-foreground: oklch(0.6 0.02 240);
-  --border: oklch(0.18 0.015 240);
-  --input: oklch(0.15 0.015 240);
-  --ring: oklch(0.55 0.18 220);
+  --muted: oklch(0.92 0.005 0);
+  --muted-foreground: oklch(0.45 0.01 0);
+  --border: oklch(0.85 0.005 0);
+  --input: oklch(0.92 0.005 0);
+  --ring: oklch(0.55 0.15 230);
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 }
 
 @theme {
@@ -67,30 +69,17 @@
   --radius-full: 9999px;
 }
 
-/* Custom scrollbar for chat */
+/* Custom scrollbar for clean UI */
 .chat-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.chat-scrollbar::-webkit-scrollbar-track {
+  width: 0px;
   background: transparent;
 }
 
-.chat-scrollbar::-webkit-scrollbar-thumb {
-  background: oklch(0.25 0.01 240);
-  border-radius: 2px;
-}
-
-.chat-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.35 0.02 240);
-}
-
-/* Dark theme glass effect */
-.glass-effect {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: oklch(0.1 0.005 240 / 0.8);
-  border: 1px solid oklch(0.2 0.01 240 / 0.2);
+/* Ensure proper contrast for all text elements */
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Recording animation */
