@@ -369,11 +369,64 @@ function App() {
                     </div>
                   </div>
                   
-                  {/* Suggested question */}
-                  <div className="bg-muted rounded-2xl p-4 text-center">
-                    <p className="text-foreground font-medium">
-                      Dudas sobre tu estancia
+                  {/* Predefined questions */}
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground font-medium mb-4">
+                      Preguntas frecuentes:
                     </p>
+                    <div className="grid gap-3">
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        onClick={() => setInputValue('¿Cuál es la clave wifi?')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-primary">
+                            <CaretRight size={16} weight="bold" />
+                          </div>
+                          <span className="text-foreground">¿Cuál es la clave wifi?</span>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        onClick={() => setInputValue('¿Cuáles son los horarios de desayunos, comidas y cenas?')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-primary">
+                            <CaretRight size={16} weight="bold" />
+                          </div>
+                          <span className="text-foreground">¿Cuáles son los horarios de desayunos, comidas y cenas?</span>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        onClick={() => setInputValue('Necesito la guía de transporte público')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-primary">
+                            <CaretRight size={16} weight="bold" />
+                          </div>
+                          <span className="text-foreground">Necesito la guía de transporte público</span>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        onClick={() => setInputValue('Restaurantes recomendados cercanos')}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-primary">
+                            <CaretRight size={16} weight="bold" />
+                          </div>
+                          <span className="text-foreground">Restaurantes recomendados cercanos</span>
+                        </div>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
