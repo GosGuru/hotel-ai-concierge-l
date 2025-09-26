@@ -350,7 +350,6 @@ function App() {
           <h1 className="text-lg sm:text-2xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
         </div>
       </div>
-
       {/* Main chat area */}
       <div className="flex-1 overflow-hidden bg-background">
         <ScrollArea ref={scrollAreaRef} className="h-full">
@@ -494,7 +493,6 @@ function App() {
           </div>
         </ScrollArea>
       </div>
-
       {/* Input area matching the image */}
       <div className="p-4 sm:p-6 pb-6 sm:pb-8 bg-background">
         <div className="max-w-sm sm:max-w-md mx-auto">
@@ -507,7 +505,7 @@ function App() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu consulta..."
-                  className="border-0 bg-transparent p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground"
+                  className="border-0 p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground bg-rose-400"
                   disabled={isLoading}
                 />
               </div>
@@ -590,7 +588,7 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default App
