@@ -505,7 +505,7 @@ function App() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu consulta..."
-                  className="border-0 p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground bg-rose-400"
+                  className="border-0 p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground bg-transparent"
                   disabled={isLoading}
                 />
               </div>
