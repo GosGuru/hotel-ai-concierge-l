@@ -341,48 +341,51 @@ function App() {
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       {/* Header - hotel branding matching the image */}
-      <div className="flex items-center justify-center p-6 border-b border-border bg-background">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-sm">
-            <Buildings size={24} className="text-primary-foreground" weight="bold" />
+      <div className="flex items-center justify-center p-4 sm:p-6 border-b border-border bg-background">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary flex items-center justify-center shadow-sm">
+            <Buildings size={16} className="text-primary-foreground sm:hidden" weight="bold" />
+            <Buildings size={24} className="text-primary-foreground hidden sm:block" weight="bold" />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
+          <h1 className="text-lg sm:text-2xl font-semibold text-foreground">Asistente Villa Sardinero</h1>
         </div>
       </div>
 
       {/* Main chat area */}
       <div className="flex-1 overflow-hidden bg-background">
         <ScrollArea ref={scrollAreaRef} className="h-full">
-          <div className="max-w-md mx-auto px-6 py-8">
+          <div className="max-w-sm sm:max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8">
             {(messages || []).length === 0 ? (
               <div className="flex flex-col items-start justify-center h-full min-h-[60vh]">
                 {/* Welcome message matching the image */}
-                <div className="mb-8">
-                  <div className="flex items-start gap-3 mb-6">
-                    <div className="text-2xl">
-                      <Hand size={28} className="text-primary" weight="fill" />
+                <div className="mb-6 sm:mb-8">
+                  <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div className="text-xl sm:text-2xl">
+                      <Hand size={24} className="text-primary sm:hidden" weight="fill" />
+                      <Hand size={28} className="text-primary hidden sm:block" weight="fill" />
                     </div>
-                    <div className="text-base leading-relaxed text-foreground">
-                      <p className="mb-4">
+                    <div className="text-sm sm:text-base leading-relaxed text-foreground">
+                      <p className="mb-3 sm:mb-4">
                         Hola! Soy tu asistente digital 24/7. Puedo ayudarte con dudas, recomendaciones locales y funcionamiento.
                       </p>
                     </div>
                   </div>
                   
                   {/* Predefined questions */}
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground font-medium mb-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-3 sm:mb-4">
                       Preguntas frecuentes:
                     </p>
-                    <div className="grid gap-3">
+                    <div className="grid gap-2 sm:gap-3">
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
                         onClick={() => setInputValue('¿Cuál es la clave wifi?')}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div className="text-primary">
-                            <CaretRight size={16} weight="bold" />
+                            <CaretRight size={14} className="sm:hidden" weight="bold" />
+                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
                           </div>
                           <span className="text-foreground">¿Cuál es la clave wifi?</span>
                         </div>
@@ -390,12 +393,13 @@ function App() {
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
                         onClick={() => setInputValue('¿Cuáles son los horarios de desayunos, comidas y cenas?')}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div className="text-primary">
-                            <CaretRight size={16} weight="bold" />
+                            <CaretRight size={14} className="sm:hidden" weight="bold" />
+                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
                           </div>
                           <span className="text-foreground">¿Cuáles son los horarios de desayunos, comidas y cenas?</span>
                         </div>
@@ -403,12 +407,13 @@ function App() {
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
                         onClick={() => setInputValue('Necesito la guía de transporte público')}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div className="text-primary">
-                            <CaretRight size={16} weight="bold" />
+                            <CaretRight size={14} className="sm:hidden" weight="bold" />
+                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
                           </div>
                           <span className="text-foreground">Necesito la guía de transporte público</span>
                         </div>
@@ -416,12 +421,13 @@ function App() {
                       
                       <Button
                         variant="outline"
-                        className="justify-start text-left h-auto p-4 bg-card hover:bg-muted border-border rounded-2xl"
+                        className="justify-start text-left h-auto p-3 sm:p-4 bg-card hover:bg-muted border-border rounded-xl sm:rounded-2xl text-sm sm:text-base"
                         onClick={() => setInputValue('Restaurantes recomendados cercanos')}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div className="text-primary">
-                            <CaretRight size={16} weight="bold" />
+                            <CaretRight size={14} className="sm:hidden" weight="bold" />
+                            <CaretRight size={16} className="hidden sm:block" weight="bold" />
                           </div>
                           <span className="text-foreground">Restaurantes recomendados cercanos</span>
                         </div>
@@ -431,33 +437,37 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {(messages || []).map((message) => (
                   <div key={message.id} className="animate-in slide-in-from-bottom-2 duration-300">
                     {message.role === 'user' ? (
-                      <div className="flex justify-end mb-4">
-                        <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-3 max-w-[85%] text-base">
+                      <div className="flex justify-end mb-3 sm:mb-4">
+                        <div className="bg-primary text-primary-foreground rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 max-w-[85%] text-sm sm:text-base">
                           {message.content}
                         </div>
                       </div>
                     ) : (
-                      <div className="flex gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                          <Sparkle size={16} className="text-muted-foreground" weight="fill" />
+                      <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                          <Sparkle size={12} className="text-muted-foreground sm:hidden" weight="fill" />
+                          <Sparkle size={16} className="text-muted-foreground hidden sm:block" weight="fill" />
                         </div>
-                        <div className="flex-1 space-y-3">
-                          <div className="text-base leading-relaxed text-foreground whitespace-pre-wrap">
+                        <div className="flex-1 space-y-2 sm:space-y-3">
+                          <div className="text-sm sm:text-base leading-relaxed text-foreground whitespace-pre-wrap">
                             {message.content}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
-                              <Copy size={16} />
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
+                              <Copy size={12} className="sm:hidden" />
+                              <Copy size={16} className="hidden sm:block" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
-                              <ThumbsUp size={16} />
+                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
+                              <ThumbsUp size={12} className="sm:hidden" />
+                              <ThumbsUp size={16} className="hidden sm:block" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground hover:text-foreground">
-                              <ThumbsDown size={16} />
+                            <Button variant="ghost" size="icon" className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground">
+                              <ThumbsDown size={12} className="sm:hidden" />  
+                              <ThumbsDown size={16} className="hidden sm:block" />
                             </Button>
                           </div>
                         </div>
@@ -468,13 +478,14 @@ function App() {
                 
                 {/* Loading indicator */}
                 {isLoading && (
-                  <div className="flex gap-3 mb-6 animate-in slide-in-from-bottom-2 duration-300">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
-                      <Sparkle size={16} className="text-muted-foreground animate-pulse" weight="fill" />
+                  <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6 animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
+                      <Sparkle size={12} className="text-muted-foreground animate-pulse sm:hidden" weight="fill" />
+                      <Sparkle size={16} className="text-muted-foreground animate-pulse hidden sm:block" weight="fill" />
                     </div>
                     <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-20 bg-muted" />
-                      <Skeleton className="h-4 w-32 bg-muted" />
+                      <Skeleton className="h-3 sm:h-4 w-16 sm:w-20 bg-muted" />
+                      <Skeleton className="h-3 sm:h-4 w-24 sm:w-32 bg-muted" />
                     </div>
                   </div>
                 )}
@@ -485,10 +496,10 @@ function App() {
       </div>
 
       {/* Input area matching the image */}
-      <div className="p-6 pb-8 bg-background">
-        <div className="max-w-md mx-auto">
+      <div className="p-4 sm:p-6 pb-6 sm:pb-8 bg-background">
+        <div className="max-w-sm sm:max-w-md mx-auto">
           <div className="relative">
-            <div className="flex items-center gap-3 bg-input border border-border rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 sm:gap-3 bg-background border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4">
               <div className="flex-1">
                 <Input
                   ref={inputRef}
@@ -496,18 +507,18 @@ function App() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu consulta..."
-                  className="border-0 bg-transparent p-0 text-base focus-visible:ring-0 placeholder:text-muted-foreground"
+                  className="border-0 bg-transparent p-0 text-sm sm:text-base focus-visible:ring-0 shadow-none placeholder:text-muted-foreground"
                   disabled={isLoading}
                 />
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 {/* Voice recording button */}
                 <div className="relative">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className={`w-10 h-10 transition-colors relative rounded-full ${ 
+                    className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors relative rounded-full ${ 
                       !recognition 
                         ? 'text-muted-foreground/50 cursor-not-allowed'
                         : isRecording 
@@ -518,13 +529,23 @@ function App() {
                     disabled={isLoading || !recognition}
                     title={!recognition ? 'Función de voz no disponible en este navegador' : isRecording ? 'Detener grabación' : 'Grabar mensaje de voz'}
                   >
-                    {isRecording ? <MicrophoneSlash size={20} /> : <Microphone size={20} />}
+                    {isRecording ? (
+                      <>
+                        <MicrophoneSlash size={16} className="sm:hidden" />
+                        <MicrophoneSlash size={20} className="hidden sm:block" />
+                      </>
+                    ) : (
+                      <>
+                        <Microphone size={16} className="sm:hidden" />
+                        <Microphone size={20} className="hidden sm:block" />
+                      </>
+                    )}
                     
                     {/* Audio level indicator */}
                     {isRecording && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
+                      <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 flex items-center justify-center">
                         <div 
-                          className="w-1.5 h-1.5 bg-white rounded-full transition-transform duration-100 audio-level-dot"
+                          className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full transition-transform duration-100 audio-level-dot"
                           style={{ 
                             transform: `scale(${0.8 + audioLevel * 0.8})`,
                             opacity: 0.8 + audioLevel * 0.2
@@ -536,13 +557,13 @@ function App() {
                   
                   {/* Audio waveform visualization */}
                   {isRecording && (
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex items-end gap-0.5 h-4">
+                    <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex items-end gap-0.5 h-3 sm:h-4">
                       {[...Array(5)].map((_, i) => (
                         <div
                           key={i}
                           className="w-0.5 bg-red-400 rounded-full transition-all duration-100 wave-bar"
                           style={{
-                            height: `${Math.max(4, (audioLevel * 12) + 4)}px`,
+                            height: `${Math.max(3, (audioLevel * 10) + 3)}px`,
                             opacity: 0.7 + audioLevel * 0.3,
                             animationDelay: `${i * 80}ms`,
                             animationDuration: `${400 + i * 100}ms`
@@ -558,9 +579,10 @@ function App() {
                   onClick={handleSendMessage}
                   disabled={isLoading || !inputValue.trim()}
                   size="icon"
-                  className="w-10 h-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full disabled:opacity-50"
+                  className="w-8 h-8 sm:w-10 sm:h-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full disabled:opacity-50"
                 >
-                  <CaretRight size={20} weight="bold" />
+                  <CaretRight size={16} className="sm:hidden" weight="bold" />
+                  <CaretRight size={20} className="hidden sm:block" weight="bold" />
                 </Button>
               </div>
             </div>
