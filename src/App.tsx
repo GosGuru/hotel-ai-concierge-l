@@ -6,6 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 import { Skeleton } from './components/ui/skeleton'
 import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Paperclip, Buildings, CaretRight, Hand, Check, Trash, X } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { usePreferredLocale } from './hooks/usePreferredLocale'
+import { messages as translations, type MessageKey } from './i18n/messages'
 
 
 
@@ -75,13 +78,20 @@ const formatMessageContent = (content: string) => {
 };
 
 function App() {
-  const [messages, setMessages, deleteMessages] = useLocalStorage<Message[]>('chat-messages', [])
+  const { locale, formatMessage } = usePreferredLocale()
+  const [chatMessages, setChatMessages, deleteChatMessages] = useLocalStorage<Message[]>('chat-messages', [])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const [showClearModal, setShowClearModal] = useState(false)
+
+  // Helper function to get translated message
+  const t = (key: MessageKey) => {
+    const translation = translations[locale as keyof typeof translations]?.[key] || translations['es-UY'][key] || key
+    return translation
+  }
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -91,12 +101,29 @@ function App() {
         scrollContainer.scrollTop = scrollContainer.scrollHeight
       }
     }
-  }, [messages, isLoading])
+  }, [chatMessages, isLoading])
 
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  // Locale changes (no-op in production, kept for possible side-effects)
+  useEffect(() => {
+    // intentionally silent
+  }, [locale])
+
+  // Listen for custom locale change events (silent)
+  useEffect(() => {
+    const handleCustomLocaleChange = () => {}
+    window.addEventListener('localeChanged', handleCustomLocaleChange as EventListener)
+    return () => {
+      window.removeEventListener('localeChanged', handleCustomLocaleChange as EventListener)
+    }
+  }, [])
+
+  // Handle language change
+  const handleLanguageChange = (_newLocale: string) => {}
 
   const sendMessageToAI = async (messageContent: string, currentMessages: Message[]) => {
     if (!messageContent.trim() || isLoading) return
@@ -112,7 +139,8 @@ function App() {
         message: messageContent.trim(),
         role: 'user',
         timestamp: Date.now(),
-        sessionId: 'hotel-chat-session', // You can make this dynamic per user
+  sessionId: 'hotel-chat-session', // You can make this dynamic per user
+  locale: locale, // Send current locale to AI
         conversationHistory: conversationHistory.map(msg => ({
           role: msg.role,
           content: msg.content,
@@ -121,10 +149,13 @@ function App() {
       }
 
       // Send to N8N webhook
-      const response = await fetch('https://n8n-n8n.ua4qkv.easypanel.host/webhook/8cc93673-7b91-4992-aca5-834c8e66890a', {
+  const primaryWebhookUrl = (import.meta as any)?.env?.VITE_N8N_WEBHOOK_URL || 'https://n8n-n8n.ua4qkv.easypanel.host/webhook/8cc93673-7b91-4992-aca5-834c8e66890a'
+      const response = await fetch(primaryWebhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': locale,
         },
         body: JSON.stringify(payload)
       })
@@ -133,66 +164,148 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      // Parse N8N streaming response (JSONL format)
-      const responseText = await response.text()
-      console.log('N8N Response (raw):', responseText)
-      
-      // Parse streaming JSONL response
-      let assistantContent = ''
-      
-      try {
-        // Split by lines and parse each JSON object
-        const lines = responseText.trim().split('\n')
-        
-        for (const line of lines) {
-          if (line.trim()) {
+      // Helper to parse a Response into assistant text
+      const parseN8nResponse = async (resp: Response): Promise<string> => {
+        let assistantContentInner = ''
+        try {
+          const contentType = resp.headers.get('content-type') || ''
+          const status = resp.status
+          let rawText = ''
+          try { rawText = await resp.clone().text() } catch {}
+          if (!rawText) { try { rawText = await resp.text() } catch {} }
+          // silent logs in production; keep variables for parsing only
+
+          const extractAssistantContent = (data: any): string => {
             try {
-              const jsonData = JSON.parse(line)
-              
-              // Extract content from streaming data
-              if (jsonData.type === 'item' && jsonData.content) {
-                assistantContent += jsonData.content
+              if (!data) return ''
+              if (typeof data === 'string') return data
+              if (typeof data.output === 'string') return data.output
+              if (typeof data.response === 'string') return data.response
+              if (typeof data.text === 'string') return data.text
+              if (typeof data.message === 'string') return data.message
+              if (typeof data.content === 'string') return data.content
+              if (Array.isArray(data.items)) {
+                for (const item of data.items) {
+                  const s = extractAssistantContent(item?.json || item)
+                  if (s) return s
+                }
               }
-            } catch (lineError) {
-              console.warn('Could not parse line:', line, lineError)
+              if (data?.json) {
+                const s = extractAssistantContent(data.json)
+                if (s) return s
+              }
+              if (data?.data) {
+                const s = extractAssistantContent(data.data)
+                if (s) return s
+              }
+              if (Array.isArray(data)) {
+                // Common N8N shape: array of items with { output: string, ... }
+                for (const item of data) {
+                  if (item && typeof item.output === 'string') return item.output
+                }
+                for (const item of data) {
+                  const s = extractAssistantContent(item)
+                  if (s) return s
+                }
+              }
+              const keysToTry = ['output', 'response', 'text', 'message', 'content']
+              for (const key of keysToTry) {
+                try {
+                  const val = (data as any)[key]
+                  const s = extractAssistantContent(val)
+                  if (s) return s
+                } catch {}
+              }
+              return ''
+            } catch {
+              return ''
             }
           }
-        }
-        
-        // Fallback: if no streaming content found, try parsing as single JSON
-        if (!assistantContent && responseText) {
-          try {
-            const singleData = JSON.parse(responseText)
-            assistantContent = singleData.response || singleData.message || singleData.text || ''
-          } catch {
-            // Final fallback: use raw text
-            assistantContent = responseText
+
+          // Whole JSON parse
+          if (rawText && /^[\s\uFEFF\u200B]*[\[{]/.test(rawText)) {
+            try {
+              const parsed = JSON.parse(rawText)
+              assistantContentInner = extractAssistantContent(parsed)
+            } catch (e) {
+              // ignore and fallback to NDJSON/text
+            }
           }
+
+          // NDJSON
+          if (!assistantContentInner && rawText) {
+            const lines = rawText.trim().split('\n')
+            if (lines.length > 1) {
+              for (const rawLine of lines) {
+                const line = rawLine.trim()
+                if (!line) continue
+                try {
+                  const jsonLine = JSON.parse(line)
+                  if (jsonLine?.type === 'item' && typeof jsonLine.content === 'string') {
+                    assistantContentInner += jsonLine.content
+                  } else {
+                    const s = extractAssistantContent(jsonLine)
+                    if (s) assistantContentInner += s
+                  }
+                } catch {
+                  if (!assistantContentInner) assistantContentInner = line
+                }
+              }
+            }
+          }
+
+          // Fallback to plain text
+          if (!assistantContentInner && rawText) {
+            assistantContentInner = rawText
+          }
+        } catch (error) {
+          // silent catch, leave empty to trigger fallbacks above
+          assistantContentInner = ''
         }
-        
-      } catch (error) {
-        console.error('Error parsing N8N response:', error)
-        assistantContent = 'Lo siento, no he podido procesar su consulta en este momento.'
+        return assistantContentInner
+      }
+
+      // Parse primary response
+      let assistantContent = await parseN8nResponse(response)
+
+      // Fallback: if empty, try the test URL (useful when prod webhook is configured to respond without body)
+      if (!assistantContent) {
+        try {
+          const testWebhookUrl = primaryWebhookUrl.replace('/webhook/', '/webhook-test/')
+          const responseTest = await fetch(testWebhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json, text/plain, */*',
+              'Accept-Language': locale,
+            },
+            body: JSON.stringify(payload)
+          })
+          if (responseTest.ok) {
+            assistantContent = await parseN8nResponse(responseTest)
+          }
+        } catch {
+          // ignore
+        }
       }
       
       // Create assistant message with parsed content
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: assistantContent || 'Lo siento, no he podido procesar su consulta en este momento.',
+        content: assistantContent || t('error.unavailable'),
         role: 'assistant',
         timestamp: Date.now() + 1
       }
 
-      setMessages([...currentMessages, assistantMessage])
-    } catch (error) {
-      console.error('Error sending message to N8N:', error)
+      setChatMessages([...currentMessages, assistantMessage])
+    } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Disculpe, he encontrado un error al procesar su consulta. Por favor, inténtelo nuevamente.',
+        content: t('error.processing'),
         role: 'assistant',
         timestamp: Date.now() + 1
       }
-      setMessages([...currentMessages, errorMessage])
+      setChatMessages([...currentMessages, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -212,8 +325,8 @@ function App() {
     setInputValue('')
     
     // Add user message immediately and get updated messages
-    const updatedMessages = [...(messages || []), userMessage]
-    setMessages(updatedMessages)
+    const updatedMessages = [...(chatMessages || []), userMessage]
+    setChatMessages(updatedMessages)
     
     // Send to AI with the updated messages that include the user message
     await sendMessageToAI(messageToSend, updatedMessages)
@@ -227,7 +340,7 @@ function App() {
   }
 
   const clearChat = () => {
-    setMessages([])
+    setChatMessages([])
     setShowClearModal(false)
   }
 
@@ -239,16 +352,26 @@ function App() {
 
   return (
     <div className="relative flex flex-col h-screen overflow-hidden bg-background text-foreground">
-      {/* Header - hotel branding matching the image */}
+      {/* Header with language selector */}
       <motion.div 
         className="flex items-center justify-between flex-shrink-0 p-3 border-b sm:p-4 bg-background/95 backdrop-blur-sm border-border/50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <div className="flex-1" />
+        {/* Language switcher - left */}
         <motion.div 
-          className="flex items-center gap-2 sm:gap-3"
+          className="flex-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <LanguageSwitcher onLanguageChange={handleLanguageChange} />
+        </motion.div>
+
+        {/* Title - centered on mobile */}
+        <motion.div 
+          className="flex items-center gap-2 sm:gap-3 absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
@@ -268,18 +391,18 @@ function App() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
           >
-            Asistente Villa Sardinero
+            {t('header.title')}
           </motion.h1>
         </motion.div>
         
-        {/* Clear chat button - only show if there are messages */}
+        {/* Clear chat button - right */}
         <motion.div 
           className="flex justify-end flex-1"
           initial={{ opacity: 0 }}
-          animate={{ opacity: (messages || []).length > 0 ? 1 : 0 }}
+          animate={{ opacity: (chatMessages || []).length > 0 ? 1 : 0 }}
           transition={{ duration: 0.3 }}
         >
-          {(messages || []).length > 0 && (
+          {(chatMessages || []).length > 0 && (
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -290,7 +413,7 @@ function App() {
                 size="icon"
                 className="w-8 h-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 onClick={handleClearClick}
-                title="Limpiar conversación"
+                title={t('header.clearChat')}
               >
                 <Trash size={16} />
               </Button>
@@ -302,7 +425,7 @@ function App() {
       <div className="flex-1 min-h-0 overflow-hidden bg-background">
         <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="w-full max-w-md min-h-full px-3 py-4 mx-auto sm:py-6">
-            {(messages || []).length === 0 ? (
+            {(chatMessages || []).length === 0 ? (
               <motion.div 
                 className="flex flex-col justify-center h-full min-h-[60vh] space-y-4"
                 initial={{ opacity: 0, y: 20 }}
@@ -338,7 +461,7 @@ function App() {
                     transition={{ duration: 0.5, delay: 1, ease: "easeOut" }}
                   >
                     <p className="mb-2">
-                      ¡Hola! Soy tu asistente digital 24/7. Puedo ayudarte con dudas, recomendaciones locales y funcionamiento.
+                      {t('welcome.greeting')}
                     </p>
                   </motion.div>
                 </motion.div>
@@ -351,79 +474,78 @@ function App() {
                   transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
                 >
                   <p className="mb-3 text-xs font-medium sm:text-sm text-muted-foreground">
-                    Preguntas frecuentes:
+                    {t('welcome.frequentQuestions')}
                   </p>
-                  <div className="flex flex-col w-full gap-2 overflow-hidden">
+                  <div className="flex flex-col w-full gap-2 overflow-visible">
                     {[
-                      '¿Cuál es la clave wifi?',
-                      '¿Cuáles son los horarios de desayunos, comidas y cenas?',
-                      'Necesito la guía de transporte público',
-                      'Restaurantes recomendados cercanos'
-                    ].map((question, index) => (
-                      <motion.div
-                        key={question}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ 
-                          duration: 0.4, 
-                          delay: 1.4 + index * 0.1, 
-                          ease: "easeOut" 
-                        }}
-                      >
+                      'welcome.questions.wifi',
+                      'welcome.questions.schedule',
+                      'welcome.questions.transport',
+                      'welcome.questions.restaurants'
+                    ].map((questionKey, index) => {
+                      const question = t(questionKey as MessageKey)
+                      return (
                         <motion.div
-                          whileHover={{ 
-                            scale: 1.02,
-                            transition: { type: "spring", stiffness: 300, damping: 20 }
+                          key={questionKey}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ 
+                            duration: 0.4, 
+                            delay: 1.4 + index * 0.1, 
+                            ease: "easeOut" 
                           }}
-                          whileTap={{ scale: 0.98 }}
                         >
-                          <Button
-                            variant="ghost"
-                            className="justify-start w-full h-auto p-3 overflow-hidden text-sm text-left transition-all duration-200 bg-muted/30 hover:bg-muted/50 rounded-xl hover:shadow-sm"
-                            onClick={async () => {
-                              // Show the question in input briefly
-                              setInputValue(question)
-                              
-                              // Auto-send after short delay
-                              setTimeout(async () => {
-                                const userMessage: Message = {
-                                  id: Date.now().toString(),
-                                  content: question,
-                                  role: 'user',
-                                  timestamp: Date.now()
-                                }
-                                
-                                // Add user message immediately and get updated messages
-                                const updatedMessages = [...(messages || []), userMessage]
-                                setMessages(updatedMessages)
-                                setInputValue('')
-                                
-                                // Send to AI with updated messages
-                                await sendMessageToAI(question, updatedMessages)
-                              }, 300)
+                          <motion.div
+                            whileHover={{ 
+                              scale: 1.02,
+                              transition: { type: "spring", stiffness: 300, damping: 20 }
                             }}
+                            whileTap={{ scale: 0.98 }}
                           >
-                            <div className="flex items-start w-full gap-3 overflow-hidden">
-                              <motion.div 
-                                className="text-primary shrink-0 mt-0.5"
-                                whileHover={{ x: 2 }}
-                                transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                              >
-                                <CaretRight size={14} weight="bold" />
-                              </motion.div>
-                              <span className="flex-1 overflow-hidden leading-relaxed text-left break-words whitespace-normal text-foreground">{question}</span>
-                            </div>
-                          </Button>
+                            <Button
+                              variant="ghost"
+                              className="justify-start w-full h-auto p-3 text-sm text-left transition-all duration-200 bg-muted/30 hover:bg-muted/50 rounded-xl hover:shadow-sm overflow-visible"
+                              onClick={async () => {
+                                setInputValue(question)
+                                
+                                setTimeout(async () => {
+                                  const userMessage: Message = {
+                                    id: Date.now().toString(),
+                                    content: question,
+                                    role: 'user',
+                                    timestamp: Date.now()
+                                  }
+                                  
+                                  const updatedMessages = [...(chatMessages || []), userMessage]
+                                  setChatMessages(updatedMessages)
+                                  setInputValue('')
+                                  
+                                  await sendMessageToAI(question, updatedMessages)
+                                }, 300)
+                              }}
+                            >
+                              <div className="flex items-start w-full gap-3 overflow-hidden">
+                                <motion.div 
+                                  className="text-primary shrink-0 mt-0.5"
+                                  whileHover={{ x: 2 }}
+                                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                                >
+                                  <CaretRight size={14} weight="bold" />
+                                </motion.div>
+                                <span className="flex-1 overflow-hidden leading-relaxed text-left break-words whitespace-normal text-foreground">{question}</span>
+                              </div>
+                            </Button>
+                          </motion.div>
                         </motion.div>
-                      </motion.div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </motion.div>
               </motion.div>
             ) : (
               <div className="w-full space-y-3 sm:space-y-4">
                 <AnimatePresence mode="popLayout">
-                  {(messages || []).map((message, index) => (
+                  {(chatMessages || []).map((message, index) => (
                     <motion.div 
                       key={message.id} 
                       className="w-full"
@@ -515,7 +637,7 @@ function App() {
                                     setCopiedMessageId(message.id)
                                     setTimeout(() => setCopiedMessageId(null), 2000)
                                   }}
-                                  title="Copiar mensaje"
+                                  title={t('chat.copy')}
                                 >
                                   <AnimatePresence mode="wait">
                                     {copiedMessageId === message.id ? (
@@ -633,7 +755,7 @@ function App() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Escribe tu consulta..."
+                  placeholder={t('input.placeholder')}
                   className="w-full p-0 text-sm bg-white border-0 shadow-none sm:text-base placeholder:text-muted-foreground"
                   disabled={isLoading}
                   style={{ 
@@ -664,6 +786,7 @@ function App() {
                       disabled={isLoading || !inputValue.trim()}
                       size="icon"
                       className="transition-all duration-200 rounded-full w-7 h-7 sm:w-8 sm:h-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      title={t('input.send')}
                     >
                       <motion.div
                         animate={isLoading ? { rotate: 360 } : {}}
@@ -705,16 +828,16 @@ function App() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">
-                    Limpiar conversación
+                    {t('clear.title')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Esta acción no se puede deshacer
+                    {t('clear.subtitle')}
                   </p>
                 </div>
               </div>
               
               <p className="mb-6 text-sm text-muted-foreground">
-                ¿Estás seguro de que deseas eliminar todos los mensajes de la conversación?
+                {t('clear.description')}
               </p>
               
               <div className="flex gap-3">
@@ -723,14 +846,14 @@ function App() {
                   className="flex-1"
                   onClick={() => setShowClearModal(false)}
                 >
-                  Cancelar
+                  {t('clear.cancel')}
                 </Button>
                 <Button
                   variant="destructive"
                   className="flex-1"
                   onClick={clearChat}
                 >
-                  Eliminar todo
+                  {t('clear.confirm')}
                 </Button>
               </div>
             </motion.div>
