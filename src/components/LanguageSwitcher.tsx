@@ -135,9 +135,13 @@ export function LanguageSwitcher({ onLanguageChange, className = '' }: LanguageS
           aria-label={`Current language: ${currentLocale.nativeName}. Click to change language`}
           data-qa="language-button-desktop"
         >
-          <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded" aria-hidden="true">
-            {currentLocale.flag}
-          </span>
+          {currentLocale.Icon ? (
+            <currentLocale.Icon width={18} height={12} />
+          ) : (
+            <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded" aria-hidden="true">
+              {currentLocale.flag}
+            </span>
+          )}
           <span className="text-sm font-medium text-foreground min-w-0">
             {currentLocale.label}
           </span>
@@ -165,7 +169,11 @@ export function LanguageSwitcher({ onLanguageChange, className = '' }: LanguageS
           data-qa="language-button-mobile"
         >
           <div className="relative flex items-center justify-center">
-            <GlobeHemisphereWest size={18} className="text-primary" />
+            {currentLocale.Icon ? (
+              <currentLocale.Icon width={20} height={14} />
+            ) : (
+              <GlobeHemisphereWest size={18} className="text-primary" />
+            )}
             <span className="absolute -bottom-1 -right-2 text-[10px] font-extrabold text-primary bg-primary/10 px-1 py-0.5 rounded" aria-hidden="true">
               {currentLocale.flag}
             </span>
@@ -217,9 +225,13 @@ export function LanguageSwitcher({ onLanguageChange, className = '' }: LanguageS
                 data-qa={`language-option-${localeOption.code}`}
                 onMouseEnter={() => setFocusedIndex(index)}
               >
-                <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded min-w-[2rem] text-center" aria-hidden="true">
-                  {localeOption.flag}
-                </span>
+                {localeOption.Icon ? (
+                  <localeOption.Icon width={18} height={12} />
+                ) : (
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded min-w-[2rem] text-center" aria-hidden="true">
+                    {localeOption.flag}
+                  </span>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-foreground">
                     {localeOption.label}
