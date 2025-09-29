@@ -3,17 +3,21 @@ import { LocaleContext } from '../i18n/LocaleProvider'
 
 export interface Locale {
   code: string
-  flag: string
+  flag: string // textual fallback (code)
   label: string
   nativeName: string
+  Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
 
+import React from 'react'
+import { FlagUY, FlagUS, FlagFR, FlagBR, FlagDE, FlagES } from '@/components/icons/flags'
+
 export const SUPPORTED_LOCALES: Locale[] = [
-  { code: 'es-UY', flag: 'UY', label: 'Español', nativeName: 'Español' },
-  { code: 'en', flag: 'EN', label: 'English', nativeName: 'English' },
-  { code: 'fr', flag: 'FR', label: 'Français', nativeName: 'Français' },
-  { code: 'pt-BR', flag: 'BR', label: 'Português', nativeName: 'Português (BR)' },
-  { code: 'de', flag: 'DE', label: 'Deutsch', nativeName: 'Deutsch' }
+  { code: 'es-UY', flag: 'ES', label: 'Español', nativeName: 'Español', Icon: FlagES },
+  { code: 'en',   flag: 'EN', label: 'English', nativeName: 'English', Icon: FlagUS },
+  { code: 'fr',   flag: 'FR', label: 'Français', nativeName: 'Français', Icon: FlagFR },
+  { code: 'pt-BR',flag: 'BR', label: 'Português', nativeName: 'Português (BR)', Icon: FlagBR },
+  { code: 'de',   flag: 'DE', label: 'Deutsch', nativeName: 'Deutsch', Icon: FlagDE }
 ]
 
 const DEFAULT_LOCALE = 'es-UY'
