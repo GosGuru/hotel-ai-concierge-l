@@ -98,14 +98,14 @@ function App() {
     inputRef.current?.focus()
   }, [])
 
-  const sendMessageToAI = async (messageContent: string) => {
+  const sendMessageToAI = async (messageContent: string, currentMessages: Message[]) => {
     if (!messageContent.trim() || isLoading) return
 
     setIsLoading(true)
 
     try {
       // Get conversation history for context
-      const conversationHistory = (messages || []).slice(-10) // Keep last 10 messages for context
+      const conversationHistory = (currentMessages || []).slice(-10) // Keep last 10 messages for context
       
       // Prepare payload for N8N webhook
       const payload = {
@@ -183,7 +183,7 @@ function App() {
         timestamp: Date.now() + 1
       }
 
-      setMessages(currentMessages => [...(currentMessages || []), assistantMessage])
+      setMessages([...currentMessages, assistantMessage])
     } catch (error) {
       console.error('Error sending message to N8N:', error)
       const errorMessage: Message = {
@@ -192,7 +192,7 @@ function App() {
         role: 'assistant',
         timestamp: Date.now() + 1
       }
-      setMessages(currentMessages => [...(currentMessages || []), errorMessage])
+      setMessages([...currentMessages, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -208,13 +208,15 @@ function App() {
       timestamp: Date.now()
     }
 
-    // Add user message immediately
-    setMessages(currentMessages => [...(currentMessages || []), userMessage])
     const messageToSend = inputValue.trim()
     setInputValue('')
     
-    // Send to AI
-    await sendMessageToAI(messageToSend)
+    // Add user message immediately and get updated messages
+    const updatedMessages = [...(messages || []), userMessage]
+    setMessages(updatedMessages)
+    
+    // Send to AI with the updated messages that include the user message
+    await sendMessageToAI(messageToSend, updatedMessages)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -391,12 +393,13 @@ function App() {
                                   timestamp: Date.now()
                                 }
                                 
-                                // Add user message immediately
-                                setMessages(currentMessages => [...(currentMessages || []), userMessage])
+                                // Add user message immediately and get updated messages
+                                const updatedMessages = [...(messages || []), userMessage]
+                                setMessages(updatedMessages)
                                 setInputValue('')
                                 
-                                // Send to AI
-                                await sendMessageToAI(question)
+                                // Send to AI with updated messages
+                                await sendMessageToAI(question, updatedMessages)
                               }, 300)
                             }}
                           >
