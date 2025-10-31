@@ -461,7 +461,7 @@ function App() {
                   transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
                 >
                   <motion.div 
-                    className="flex items-center justify-center w-8 h-8 mt-1 rounded-full bg-muted shrink-0"
+                    className="flex items-center justify-center w-8 h-8 mt-1 rounded-full bg-primary/20 shrink-0"
                     animate={{ 
                       rotate: [0, 10, -10, 0],
                       scale: [1, 1.1, 1]
@@ -476,12 +476,12 @@ function App() {
                     <Hand size={16} className="text-primary" weight="fill" />
                   </motion.div>
                   <motion.div 
-                    className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3 text-sm sm:text-base leading-relaxed shadow-sm max-w-[85%]"
+                    className="bg-gradient-to-br from-primary/15 to-primary/10 border border-primary/20 rounded-2xl rounded-bl-md px-4 py-3 text-sm sm:text-base leading-relaxed shadow-lg shadow-primary/10 max-w-[85%]"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 1, ease: "easeOut" }}
                   >
-                    <p className="mb-2">
+                    <p className="mb-2 text-foreground">
                       {t('welcome.greeting')}
                     </p>
                   </motion.div>
