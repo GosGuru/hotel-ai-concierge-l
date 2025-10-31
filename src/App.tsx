@@ -4,9 +4,11 @@ import { Input } from './components/ui/input'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 import { Skeleton } from './components/ui/skeleton'
-import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Paperclip, Buildings, CaretRight, Hand, Check, Trash, X } from '@phosphor-icons/react'
+import { PaperPlaneTilt, Sparkle, Copy, ThumbsUp, ThumbsDown, ArrowUp, Paperclip, Van, CaretRight, Hand, Check, Trash, X } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { SomosCamperLogo } from './components/SomosCamperLogo'
+import { UtilitiesIcon, WaterTankIcon, ChecklistIcon, AssistanceIcon } from './components/icons/camper-icons'
 import { usePreferredLocale } from './hooks/usePreferredLocale'
 import { messages as translations, type MessageKey } from './i18n/messages'
 
@@ -351,10 +353,24 @@ function App() {
 
 
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-background text-foreground">
+    <div className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-br from-background via-background to-accent/5 text-foreground">
+      {/* Subtle background pattern for travel/nature theme */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="camper-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <path d="M 20 20 L 30 10 L 40 20 L 35 30 Z M 60 60 L 75 45 L 90 60 Z" fill="currentColor" opacity="0.5" />
+              <circle cx="15" cy="70" r="3" fill="currentColor" opacity="0.3" />
+              <circle cx="85" cy="25" r="2" fill="currentColor" opacity="0.3" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#camper-pattern)" />
+        </svg>
+      </div>
+      
       {/* Header with language selector */}
       <motion.div 
-        className="flex items-center justify-between flex-shrink-0 p-3 border-b sm:p-4 bg-background/95 backdrop-blur-sm border-border/50"
+        className="relative z-10 flex items-center justify-between flex-shrink-0 p-3 border-b sm:p-4 bg-background/95 backdrop-blur-sm border-border/50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -377,22 +393,27 @@ function App() {
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
           <motion.div 
-            className="flex items-center justify-center rounded-lg shadow-sm w-7 h-7 sm:w-10 sm:h-10 sm:rounded-xl bg-primary"
+            className="flex items-center justify-center"
             whileHover={{ scale: 1.05, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Buildings size={14} className="text-primary-foreground sm:hidden" weight="bold" />
-            <Buildings size={20} className="hidden text-primary-foreground sm:block" weight="bold" />
+            <SomosCamperLogo size={32} className="sm:hidden" />
+            <SomosCamperLogo size={45} className="hidden sm:block" />
           </motion.div>
-          <motion.h1 
-            className="text-base font-semibold sm:text-xl text-foreground"
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+            className="hidden sm:block"
           >
-            {t('header.title')}
-          </motion.h1>
+            <h1 className="text-base font-bold sm:text-xl text-foreground">
+              {t('header.title')}
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              {t('header.subtitle')}
+            </p>
+          </motion.div>
         </motion.div>
         
         {/* Clear chat button - right */}
@@ -422,7 +443,7 @@ function App() {
         </motion.div>
       </motion.div>
       {/* Main chat area */}
-      <div className="flex-1 min-h-0 overflow-hidden bg-background">
+      <div className="relative z-0 flex-1 min-h-0 overflow-hidden bg-transparent">
         <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="w-full max-w-md min-h-full px-3 py-4 mx-auto sm:py-6">
             {(chatMessages || []).length === 0 ? (
@@ -473,16 +494,16 @@ function App() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
                 >
-                  <p className="mb-3 text-xs font-medium sm:text-sm text-muted-foreground">
+                  <p className="mb-3 text-xs font-semibold sm:text-sm text-muted-foreground">
                     {t('welcome.frequentQuestions')}
                   </p>
-                  <div className="flex flex-col w-full gap-2 overflow-visible">
+                  <div className="flex flex-col w-full gap-3 overflow-visible">
                     {[
-                      'welcome.questions.wifi',
-                      'welcome.questions.schedule',
-                      'welcome.questions.transport',
-                      'welcome.questions.restaurants'
-                    ].map((questionKey, index) => {
+                      { key: 'welcome.questions.wifi', icon: UtilitiesIcon },
+                      { key: 'welcome.questions.schedule', icon: WaterTankIcon },
+                      { key: 'welcome.questions.transport', icon: ChecklistIcon },
+                      { key: 'welcome.questions.restaurants', icon: AssistanceIcon }
+                    ].map(({ key: questionKey, icon: Icon }, index) => {
                       const question = t(questionKey as MessageKey)
                       return (
                         <motion.div
@@ -504,7 +525,7 @@ function App() {
                           >
                             <Button
                               variant="ghost"
-                              className="justify-start w-full h-auto p-3 text-sm text-left transition-all duration-200 bg-muted/30 hover:bg-muted/50 rounded-xl hover:shadow-sm overflow-visible"
+                              className="justify-start w-full h-auto p-4 text-sm text-left transition-all duration-200 bg-gradient-to-r from-muted/40 to-muted/20 hover:from-muted/60 hover:to-muted/40 rounded-xl hover:shadow-md overflow-visible border border-border/30 hover:border-primary/30"
                               onClick={async () => {
                                 setInputValue(question)
                                 
@@ -526,13 +547,13 @@ function App() {
                             >
                               <div className="flex items-start w-full gap-3 overflow-hidden">
                                 <motion.div 
-                                  className="text-primary shrink-0 mt-0.5"
-                                  whileHover={{ x: 2 }}
+                                  className="flex items-center justify-center w-10 h-10 rounded-lg shrink-0 bg-primary/10"
+                                  whileHover={{ scale: 1.1, rotate: 5 }}
                                   transition={{ type: "spring", stiffness: 500, damping: 25 }}
                                 >
-                                  <CaretRight size={14} weight="bold" />
+                                  <Icon size={20} weight="regular" className="text-primary" />
                                 </motion.div>
-                                <span className="flex-1 overflow-hidden leading-relaxed text-left break-words whitespace-normal text-foreground">{question}</span>
+                                <span className="flex-1 overflow-hidden leading-relaxed text-left break-words whitespace-normal text-foreground font-medium pt-2">{question}</span>
                               </div>
                             </Button>
                           </motion.div>
@@ -745,8 +766,8 @@ function App() {
         <div className="w-full max-w-md px-3 mx-auto">
           <div className="relative w-full input-container">
             <motion.div 
-              className="flex items-center w-full gap-2 p-3 transition-all duration-200 bg-white border border-border rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20"
-              whileHover={{ scale: 1.005 }}
+              className="flex items-center w-full gap-2 p-3 transition-all duration-200 bg-white border-2 border-border/50 rounded-2xl focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 shadow-lg shadow-primary/5"
+              whileHover={{ scale: 1.005, boxShadow: "0 10px 25px -5px rgba(0, 212, 212, 0.1)" }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <div className="flex-1 min-w-0">

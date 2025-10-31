@@ -1,7 +1,8 @@
 {
-  "name": "hotel-ai-concierge",
+  "name": "somos-camper-assistant",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Asistente oficial de Somos Camper - Soporte durante el viaje en autocaravana",
   "type": "module",
   "scripts": {
     "dev": "vite",
